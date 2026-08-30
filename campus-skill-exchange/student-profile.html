@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Student Profile - CampusSkill</title>
+
+    <link rel="stylesheet" href="../css/style.css">
+
+    <style>
+        .profile-page {
+            padding: 40px 0 60px;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-bottom: 20px;
+            color: #64748b;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .back-link:hover {
+            color: var(--primary);
+        }
+
+        .profile-hero {
+            display: flex;
+            align-items: center;
+            gap: 22px;
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+
+        .profile-hero-avatar {
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            font-size: 30px;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .profile-hero h1 {
+            font-size: 26px;
+            color: #111827;
+            margin-bottom: 6px;
+        }
+
+        .profile-hero p {
+            color: #64748b;
+            margin: 2px 0;
+        }
+
+        #studentProfileContent .dashboard-card {
+            margin-bottom: 20px;
+        }
+
+        .profile-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Navigation -->
+    <header class="navbar">
+        <div class="container nav-container">
+
+            <a href="index.html" class="logo">
+                CampusSkill
+            </a>
+
+            <nav>
+                <a href="dashboard.html">Dashboard</a>
+                <a href="learning-paths.html">Learning Paths</a>
+                <a href="search.html" class="active">Find Students</a>
+                <a href="achievements.html">Achievements</a>
+                <a href="community-highlights.html">Community</a>
+                <a href="requests.html">Requests</a>
+                <a href="profile.html">Profile</a>
+                <a href="index.html" class="logout" onclick="logout(); return false;">Logout</a>
+            </nav>
+
+        </div>
+    </header>
+
+
+    <!-- Student Profile -->
+    <main class="dashboard profile-page">
+
+        <div class="container">
+
+            <a href="search.html" class="back-link">&larr; Back to Find Students</a>
+
+            <div id="studentProfileContent">
+                <!-- Populated by script.js based on ?id= query param -->
+            </div>
+
+            <div class="profile-actions">
+                <button class="primary-btn" id="sendRequestBtn">
+                    Send Collaboration Request
+                </button>
+
+                <a href="requests.html" class="outline-btn" style="text-decoration:none; display:inline-block; text-align:center;">
+                    View My Requests
+                </a>
+            </div>
+
+        </div>
+
+    </main>
+
+
+    <!-- Footer -->
+    <footer class="footer">
+
+        <div class="container">
+
+            <p>
+                © 2026 CampusSkill. Learn together. Grow together.
+            </p>
+
+        </div>
+
+    </footer>
+
+
+    <script src="../js/script.js"></script>
+</body>
+</html>

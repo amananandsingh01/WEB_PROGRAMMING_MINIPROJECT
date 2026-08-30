@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Requests - CampusSkill</title>
+
+    <link rel="stylesheet" href="../css/style.css">
+
+    <style>
+        .requests-page {
+            padding: 40px 0 60px;
+        }
+
+        .requests-header {
+            margin-bottom: 30px;
+        }
+
+        .requests-header h1 {
+            font-size: 30px;
+            color: #1e293b;
+            margin-bottom: 8px;
+        }
+
+        .requests-header p {
+            color: #64748b;
+        }
+
+        .requests-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+        }
+
+        .request-preview {
+            flex-wrap: wrap;
+        }
+
+        .request-preview .quick-actions button {
+            border: none;
+            cursor: pointer;
+        }
+
+        @media (max-width: 900px) {
+            .requests-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Navigation -->
+    <header class="navbar">
+        <div class="container nav-container">
+
+            <a href="index.html" class="logo">
+                CampusSkill
+            </a>
+
+            <nav>
+                <a href="dashboard.html">Dashboard</a>
+                <a href="learning-paths.html">Learning Paths</a>
+                <a href="search.html">Find Students</a>
+                <a href="achievements.html">Achievements</a>
+                <a href="community-highlights.html">Community</a>
+                <a href="requests.html" class="active">Requests</a>
+                <a href="profile.html">Profile</a>
+                <a href="index.html" class="logout" onclick="logout(); return false;">Logout</a>
+            </nav>
+
+        </div>
+    </header>
+
+
+    <!-- Requests -->
+    <main class="dashboard requests-page">
+
+        <div class="container">
+
+            <div class="requests-header">
+                <h1>Collaboration Requests</h1>
+                <p>Manage the requests you've received and the ones you've sent out.</p>
+            </div>
+
+            <div class="requests-grid">
+
+                <!-- Incoming -->
+                <div class="dashboard-card">
+
+                    <div class="card-header">
+                        <div>
+                            <h2>Incoming</h2>
+                            <p>Students who want to connect with you.</p>
+                        </div>
+                    </div>
+
+                    <div id="incomingRequests">
+                        <!-- Populated by script.js -->
+                    </div>
+
+                </div>
+
+                <!-- Outgoing -->
+                <div class="dashboard-card">
+
+                    <div class="card-header">
+                        <div>
+                            <h2>Outgoing</h2>
+                            <p>Requests you've sent to other students.</p>
+                        </div>
+                    </div>
+
+                    <div id="outgoingRequests">
+                        <!-- Populated by script.js -->
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </main>
+
+
+    <!-- Footer -->
+    <footer class="footer">
+
+        <div class="container">
+
+            <p>
+                © 2026 CampusSkill. Learn together. Grow together.
+            </p>
+
+        </div>
+
+    </footer>
+
+
+    <script src="../js/script.js"></script>
+</body>
+</html>

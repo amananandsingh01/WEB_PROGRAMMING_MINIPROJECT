@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Find Students - CampusSkill</title>
+
+    <link rel="stylesheet" href="../css/style.css">
+
+    <style>
+        .search-page {
+            padding: 40px 0 60px;
+        }
+
+        .search-header {
+            margin-bottom: 30px;
+        }
+
+        .search-header h1 {
+            font-size: 30px;
+            color: #1e293b;
+            margin-bottom: 8px;
+        }
+
+        .search-header p {
+            color: #64748b;
+        }
+
+        .search-bar {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-bottom: 30px;
+        }
+
+        .search-bar input[type="text"] {
+            flex: 2;
+            min-width: 220px;
+            padding: 12px 16px;
+            border-radius: 10px;
+            border: 1px solid rgba(91, 91, 214, 0.15);
+            font-size: 15px;
+        }
+
+        .search-bar select {
+            flex: 1;
+            min-width: 180px;
+            padding: 12px 16px;
+            border-radius: 10px;
+            border: 1px solid rgba(91, 91, 214, 0.15);
+            font-size: 15px;
+            background: white;
+        }
+
+        .search-bar input:focus,
+        .search-bar select:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        #noResults {
+            display: none;
+            text-align: center;
+            padding: 40px 20px;
+            color: #64748b;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Navigation -->
+    <header class="navbar">
+        <div class="container nav-container">
+
+            <a href="index.html" class="logo">
+                CampusSkill
+            </a>
+
+            <nav>
+                <a href="dashboard.html">Dashboard</a>
+                <a href="learning-paths.html">Learning Paths</a>
+                <a href="search.html" class="active">Find Students</a>
+                <a href="achievements.html">Achievements</a>
+                <a href="community-highlights.html">Community</a>
+                <a href="requests.html">Requests</a>
+                <a href="profile.html">Profile</a>
+                <a href="index.html" class="logout" onclick="logout(); return false;">Logout</a>
+            </nav>
+
+        </div>
+    </header>
+
+
+    <!-- Search -->
+    <main class="dashboard search-page">
+
+        <div class="container">
+
+            <div class="search-header">
+                <h1>Find Students</h1>
+                <p>Search for students by name or skill, or filter by department.</p>
+            </div>
+
+            <div class="search-bar">
+
+                <input
+                    type="text"
+                    id="studentSearch"
+                    placeholder="Search by name or skill (e.g. React, Python)..."
+                    oninput="filterStudents()"
+                >
+
+                <select id="departmentFilter" onchange="filterStudents()">
+                    <option value="all">All Departments</option>
+                    <option value="Computer Science">Computer Science</option>
+                    <option value="Information Technology">Information Technology</option>
+                    <option value="Design">Design</option>
+                    <option value="Electronics">Electronics</option>
+                    <option value="Mechanical">Mechanical</option>
+                </select>
+
+            </div>
+
+            <div class="dashboard-card">
+
+                <div class="card-header">
+                    <div>
+                        <h2>Students</h2>
+                        <p>Browse students who are ready to teach and collaborate.</p>
+                    </div>
+                </div>
+
+                <div class="student-list" id="studentResults">
+                    <!-- Populated by script.js -->
+                </div>
+
+                <div id="noResults">
+                    <p>No students match your search. Try a different name, skill, or department.</p>
+                </div>
+
+            </div>
+
+        </div>
+
+    </main>
+
+
+    <!-- Footer -->
+    <footer class="footer">
+
+        <div class="container">
+
+            <p>
+                © 2026 CampusSkill. Learn together. Grow together.
+            </p>
+
+        </div>
+
+    </footer>
+
+
+    <script src="../js/script.js"></script>
+</body>
+</html>

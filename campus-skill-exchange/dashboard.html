@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Dashboard - CampusSkill</title>
+
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+
+<body>
+
+    <!-- Navigation -->
+    <header class="navbar">
+        <div class="container nav-container">
+
+            <a href="index.html" class="logo">
+                CampusSkill
+            </a>
+
+            <nav>
+                <a href="dashboard.html" class="active">Dashboard</a>
+                <a href="learning-paths.html">Learning Paths</a>
+                <a href="search.html">Find Students</a>
+                <a href="achievements.html">Achievements</a>
+                <a href="community-highlights.html">Community</a>
+                <a href="requests.html">Requests</a>
+                <a href="profile.html">Profile</a>
+                <a href="index.html" class="logout">Logout</a>
+            </nav>
+
+        </div>
+    </header>
+
+
+    <!-- Dashboard -->
+    <main class="dashboard">
+
+        <div class="container">
+
+            <!-- Welcome -->
+            <section class="dashboard-header">
+
+                <div>
+                    <p class="dashboard-label">🎓 Student Dashboard</p>
+
+                    <h1>Welcome back, Student!</h1>
+
+                    <p>
+                        Discover students, exchange skills, and keep learning.
+                    </p>
+                </div>
+
+                <a href="profile.html" class="primary-btn">
+                    Edit Profile
+                </a>
+
+            </section>
+
+
+            <!-- Quick Stats -->
+            <section class="stats-grid">
+
+                <div class="stat-card">
+                    <div class="stat-icon">🧑‍🎓</div>
+                    <div>
+                        <h3>My Profile</h3>
+                        <p>80% complete</p>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon">🔍</div>
+                    <div>
+                        <h3>Skills</h3>
+                        <p>6 skills listed</p>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon">🤝</div>
+                    <div>
+                        <h3>Connections</h3>
+                        <p>4 students</p>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon">📩</div>
+                    <div>
+                        <h3>Requests</h3>
+                        <p>2 pending</p>
+                    </div>
+                </div>
+
+            </section>
+
+
+            <!-- Main Dashboard Grid -->
+            <section class="dashboard-grid">
+
+                <!-- Left Column -->
+                <div class="dashboard-main">
+
+                    <!-- Skills -->
+                    <div class="dashboard-card">
+
+                        <div class="card-header">
+                            <div>
+                                <h2>My Skills</h2>
+                                <p>Skills you can teach and skills you want to learn.</p>
+                            </div>
+
+                            <a href="profile.html">Edit</a>
+                        </div>
+
+
+                        <div class="skills-section">
+
+                            <h3>💡 I Can Teach</h3>
+
+                            <div class="skill-tags">
+                                <span>HTML</span>
+                                <span>CSS</span>
+                                <span>JavaScript</span>
+                                <span>Python</span>
+                            </div>
+
+                        </div>
+
+
+                        <div class="skills-section">
+
+                            <h3>📚 I Want to Learn</h3>
+
+                            <div class="skill-tags">
+                                <span>React</span>
+                                <span>UI/UX Design</span>
+                                <span>Machine Learning</span>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- Achievement Badges -->
+                    <div class="dashboard-card">
+
+                        <div class="card-header">
+                            <div>
+                                <h2>🏆 Your Achievements</h2>
+                                <p>Badges earned through your learning journey.</p>
+                            </div>
+                            <a href="achievements.html">View All</a>
+                        </div>
+
+                        <div class="achievements-grid">
+
+                            <div class="badge-card">
+                                <div class="badge-icon">🌟</div>
+                                <h4>Quick Learner</h4>
+                                <p>Completed 5 skill exchanges</p>
+                            </div>
+
+                            <div class="badge-card">
+                                <div class="badge-icon">👨‍🏫</div>
+                                <h4>Mentor</h4>
+                                <p>Taught 3+ students</p>
+                            </div>
+
+                            <div class="badge-card">
+                                <div class="badge-icon">🎯</div>
+                                <h4>Goal Setter</h4>
+                                <p>Listed 5+ skills</p>
+                            </div>
+
+                            <div class="badge-card locked">
+                                <div class="badge-icon">🚀</div>
+                                <h4>Master</h4>
+                                <p>Locked - 10 exchanges needed</p>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- Learning Progress -->
+                    <div class="dashboard-card">
+
+                        <div class="card-header">
+                            <div>
+                                <h2>📈 Learning Progress</h2>
+                                <p>Track your skill development milestones.</p>
+                            </div>
+                        </div>
+
+                        <div class="progress-milestones">
+
+                            <div class="milestone">
+                                <div class="milestone-dot completed"></div>
+                                <div class="milestone-content">
+                                    <h4>Profile Created</h4>
+                                    <p class="text-muted">Aug 15, 2026</p>
+                                </div>
+                            </div>
+
+                            <div class="milestone">
+                                <div class="milestone-dot completed"></div>
+                                <div class="milestone-content">
+                                    <h4>First Collaboration</h4>
+                                    <p class="text-muted">Aug 18, 2026</p>
+                                </div>
+                            </div>
+
+                            <div class="milestone">
+                                <div class="milestone-dot"></div>
+                                <div class="milestone-content">
+                                    <h4>5 Skills Mastered</h4>
+                                    <p class="text-muted">In Progress - 3/5</p>
+                                </div>
+                            </div>
+
+                            <div class="milestone">
+                                <div class="milestone-dot"></div>
+                                <div class="milestone-content">
+                                    <h4>10 Collaborations</h4>
+                                    <p class="text-muted">Not Started - 2/10</p>
+                                </div>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- Activity Timeline -->
+                    <div class="dashboard-card">
+
+                        <div class="card-header">
+                            <div>
+                                <h2>📅 Recent Activity</h2>
+                                <p>Your recent actions and updates.</p>
+                            </div>
+                            <a href="#activity-log">View Log</a>
+                        </div>
+
+                        <div class="activity-timeline">
+
+                            <div class="activity-item">
+                                <div class="activity-icon">✅</div>
+                                <div class="activity-content">
+                                    <h4>Accepted collaboration with Ananya</h4>
+                                    <p class="text-muted">Learning JavaScript • 2 hours ago</p>
+                                </div>
+                            </div>
+
+                            <div class="activity-item">
+                                <div class="activity-icon">💬</div>
+                                <div class="activity-content">
+                                    <h4>New message from Rahul Kumar</h4>
+                                    <p class="text-muted">About Python course • 1 day ago</p>
+                                </div>
+                            </div>
+
+                            <div class="activity-item">
+                                <div class="activity-icon">📌</div>
+                                <div class="activity-content">
+                                    <h4>Bookmarked Priya's profile</h4>
+                                    <p class="text-muted">UI/UX Designer • 3 days ago</p>
+                                </div>
+                            </div>
+
+                            <div class="activity-item">
+                                <div class="activity-icon">⭐</div>
+                                <div class="activity-content">
+                                    <h4>Received 5-star review from Vikram</h4>
+                                    <p class="text-muted">Great Python tutor! • 1 week ago</p>
+                                </div>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- Recommended Students -->
+                    <div class="dashboard-card">
+
+                        <div class="card-header">
+
+                            <div>
+                                <h2>Recommended Students</h2>
+                                <p>Students who may be a good match for you.</p>
+                            </div>
+
+                            <a href="search.html">View All</a>
+
+                        </div>
+
+
+                        <div class="student-list">
+
+                            <div class="student-item">
+
+                                <div class="student-avatar">
+                                    AS
+                                </div>
+
+                                <div class="student-info">
+                                    <h3>Ananya Sharma</h3>
+                                    <p>Computer Science • 2nd Year</p>
+
+                                    <div class="mini-skills">
+                                        <span>React</span>
+                                        <span>JavaScript</span>
+                                    </div>
+                                </div>
+
+                                <a href="student-profile.html" class="outline-btn">
+                                    View
+                                </a>
+
+                            </div>
+
+
+                            <div class="student-item">
+
+                                <div class="student-avatar">
+                                    RK
+                                </div>
+
+                                <div class="student-info">
+                                    <h3>Rahul Kumar</h3>
+                                    <p>Information Technology • 3rd Year</p>
+
+                                    <div class="mini-skills">
+                                        <span>Python</span>
+                                        <span>ML</span>
+                                    </div>
+                                </div>
+
+                                <a href="student-profile.html" class="outline-btn">
+                                    View
+                                </a>
+
+                            </div>
+
+
+                            <div class="student-item">
+
+                                <div class="student-avatar">
+                                    PM
+                                </div>
+
+                                <div class="student-info">
+                                    <h3>Priya Mehta</h3>
+                                    <p>Design • 2nd Year</p>
+
+                                    <div class="mini-skills">
+                                        <span>UI/UX</span>
+                                        <span>Figma</span>
+                                    </div>
+                                </div>
+
+                                <a href="student-profile.html" class="outline-btn">
+                                    View
+                                </a>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- Your Network -->
+                    <div class="dashboard-card">
+
+                        <div class="card-header">
+                            <div>
+                                <h2>👥 Your Network</h2>
+                                <p>Students you've collaborated with recently.</p>
+                            </div>
+                            <a href="search.html">Expand</a>
+                        </div>
+
+                        <div class="network-grid">
+
+                            <div class="network-card">
+                                <div class="network-avatar">AS</div>
+                                <h4>Ananya Sharma</h4>
+                                <p class="skill">Teaching JavaScript</p>
+                                <div class="collaboration-badge">✓ Collaborated</div>
+                            </div>
+
+                            <div class="network-card">
+                                <div class="network-avatar">RK</div>
+                                <h4>Rahul Kumar</h4>
+                                <p class="skill">Teaching Python</p>
+                                <div class="collaboration-badge">✓ Collaborated</div>
+                            </div>
+
+                            <div class="network-card">
+                                <div class="network-avatar">PM</div>
+                                <h4>Priya Mehta</h4>
+                                <p class="skill">Teaching UI/UX</p>
+                                <div class="collaboration-badge">Pending</div>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- Skills Recommendations -->
+                    <div class="dashboard-card">
+
+                        <div class="card-header">
+                            <div>
+                                <h2>🎯 Recommended Skills</h2>
+                                <p>Skills you can learn based on your interests.</p>
+                            </div>
+                        </div>
+
+                        <div class="skills-recommendations">
+
+                            <div class="recommendation-item">
+                                <div class="rec-header">
+                                    <h4>React.js</h4>
+                                    <span class="difficulty">Intermediate</span>
+                                </div>
+                                <p class="rec-description">Build interactive UIs with React. Ananya and 2 others teach this.</p>
+                                <div class="rec-footer">
+                                    <div class="teachers">2 teachers available</div>
+                                    <button class="rec-btn">Find Teacher</button>
+                                </div>
+                            </div>
+
+                            <div class="recommendation-item">
+                                <div class="rec-header">
+                                    <h4>UI/UX Design</h4>
+                                    <span class="difficulty">Beginner</span>
+                                </div>
+                                <p class="rec-description">Learn design principles and Figma. Priya specializes in this.</p>
+                                <div class="rec-footer">
+                                    <div class="teachers">1 teacher available</div>
+                                    <button class="rec-btn">Find Teacher</button>
+                                </div>
+                            </div>
+
+                            <div class="recommendation-item">
+                                <div class="rec-header">
+                                    <h4>Machine Learning</h4>
+                                    <span class="difficulty">Advanced</span>
+                                </div>
+                                <p class="rec-description">Explore ML concepts and Python libraries. Rahul teaches this.</p>
+                                <div class="rec-footer">
+                                    <div class="teachers">1 teacher available</div>
+                                    <button class="rec-btn">Find Teacher</button>
+                                </div>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+
+                    <!-- Profile Completion -->
+                    <div class="dashboard-card">
+
+                        <h2>Complete Your Profile</h2>
+
+                        <p>
+                            Add more information to help other students find you.
+                        </p>
+
+                        <div class="progress-container">
+                            <div class="progress-bar">
+                                <div class="progress-fill"></div>
+                            </div>
+
+                            <strong>80%</strong>
+                        </div>
+
+                        <ul class="profile-checklist">
+                            <li>✓ Basic information</li>
+                            <li>✓ Skills</li>
+                            <li>✓ Interests</li>
+                            <li>○ Add profile photo</li>
+                            <li>○ Add bio</li>
+                        </ul>
+
+                        <a href="profile.html" class="primary-btn full-btn">
+                            Complete Profile
+                        </a>
+
+                    </div>
+
+
+                    <!-- Pending Requests -->
+                    <div class="dashboard-card">
+
+                        <div class="card-header">
+                            <div>
+                                <h2>Pending Requests</h2>
+                            </div>
+
+                            <a href="requests.html">View</a>
+                        </div>
+
+                        <div class="request-preview">
+
+                            <div class="small-avatar">
+                                AS
+                            </div>
+
+                            <div>
+                                <h3>Ananya Sharma</h3>
+                                <p>Wants to learn JavaScript</p>
+                            </div>
+
+                        </div>
+
+
+                        <div class="request-preview">
+
+                            <div class="small-avatar">
+                                VK
+                            </div>
+
+                            <div>
+                                <h3>Vikram Kumar</h3>
+                                <p>Can teach Python</p>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- Quick Actions -->
+                    <div class="dashboard-card">
+
+                        <h2>Quick Actions</h2>
+
+                        <div class="quick-actions">
+
+                            <a href="search.html">
+                                🔍 Find Students
+                            </a>
+
+                            <a href="profile.html">
+                                👤 Edit Profile
+                            </a>
+
+                            <a href="requests.html">
+                                🤝 View Requests
+                            </a>
+
+                        </div>
+
+                    </div>
+
+                </aside>
+
+            </section>
+
+        </div>
+
+    </main>
+
+
+    <!-- Footer -->
+    <footer class="footer">
+
+        <div class="container">
+
+            <p>
+                © 2026 CampusSkill. Learn together. Grow together.
+            </p>
+
+        </div>
+
+    </footer>
+
+
+    <script src="../js/script.js"></script>
+</body>
+</html>

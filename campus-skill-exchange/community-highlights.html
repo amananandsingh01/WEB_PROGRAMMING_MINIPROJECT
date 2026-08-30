@@ -1,0 +1,706 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Community Highlights - CampusSkill</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <style>
+        .highlights-page {
+            background: #f8f9fc;
+            min-height: calc(100vh - 80px);
+            padding: 50px 0;
+        }
+
+        .highlights-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .highlights-header {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        .highlights-header h1 {
+            font-size: 36px;
+            color: #1e293b;
+            margin-bottom: 10px;
+        }
+
+        .highlights-header p {
+            font-size: 16px;
+            color: #64748b;
+        }
+
+        .filter-row {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 40px;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            padding: 10px 20px;
+            border: 2px solid #cbd5e1;
+            background: white;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            color: #64748b;
+            transition: 0.3s ease;
+        }
+
+        .filter-btn.active {
+            background: #3b82f6;
+            color: white;
+            border-color: #3b82f6;
+        }
+
+        .filter-btn:hover {
+            border-color: #3b82f6;
+        }
+
+        .profiles-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 24px;
+            margin-bottom: 50px;
+        }
+
+        .profile-card {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 14px;
+            overflow: hidden;
+            transition: 0.3s ease;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .profile-card:hover {
+            box-shadow: 0 12px 28px rgba(59, 130, 246, 0.15);
+            border-color: #3b82f6;
+            transform: translateY(-4px);
+        }
+
+        .profile-header {
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            padding: 30px 20px;
+            text-align: center;
+            color: white;
+            position: relative;
+        }
+
+        .profile-badge {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            background: #fbbf24;
+            color: #92400e;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .profile-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            margin: 0 auto 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            font-weight: 700;
+            border: 3px solid white;
+        }
+
+        .profile-name {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .profile-title {
+            font-size: 13px;
+            opacity: 0.9;
+            margin-bottom: 10px;
+        }
+
+        .profile-rating {
+            font-size: 16px;
+            color: #fbbf24;
+        }
+
+        .profile-content {
+            padding: 20px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .profile-stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 18px;
+            padding-bottom: 18px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 18px;
+            font-weight: 700;
+            color: #1e293b;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: #64748b;
+            margin-top: 2px;
+        }
+
+        .profile-skills {
+            margin-bottom: 18px;
+        }
+
+        .skills-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: #1e293b;
+            margin-bottom: 8px;
+        }
+
+        .skills-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .skill-badge {
+            background: #f0f4ff;
+            color: #3b82f6;
+            padding: 5px 10px;
+            border-radius: 14px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .profile-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: auto;
+        }
+
+        .profile-btn {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.3s ease;
+            font-size: 13px;
+        }
+
+        .btn-view {
+            background: #3b82f6;
+            color: white;
+        }
+
+        .btn-view:hover {
+            background: #2563eb;
+        }
+
+        .btn-message {
+            background: white;
+            color: #3b82f6;
+            border: 2px solid #3b82f6;
+        }
+
+        .btn-message:hover {
+            background: #f0f4ff;
+        }
+
+        .section-title {
+            font-size: 24px;
+            color: #1e293b;
+            margin-bottom: 30px;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        .featured-section {
+            background: linear-gradient(135deg, #fef08a 0%, #fcd34d 100%);
+            border-radius: 14px;
+            padding: 40px;
+            margin-bottom: 50px;
+            text-align: center;
+        }
+
+        .featured-section h2 {
+            color: #92400e;
+            margin-bottom: 20px;
+        }
+
+        .featured-section p {
+            color: #78350f;
+            margin-bottom: 20px;
+        }
+
+        .featured-btn {
+            background: #92400e;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            display: inline-block;
+            transition: 0.3s ease;
+        }
+
+        .featured-btn:hover {
+            background: #78350f;
+        }
+
+        .testimonials-area {
+            background: white;
+            border-radius: 14px;
+            padding: 40px;
+            margin-top: 50px;
+        }
+
+        .testimonials-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .testimonial-card {
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 20px;
+        }
+
+        .testimonial-rating {
+            color: #f59e0b;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+
+        .testimonial-text {
+            font-size: 14px;
+            color: #64748b;
+            margin-bottom: 15px;
+            line-height: 1.6;
+            font-style: italic;
+        }
+
+        .testimonial-author {
+            font-weight: 600;
+            color: #1e293b;
+            font-size: 14px;
+        }
+
+        @media (max-width: 768px) {
+            .profiles-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .filter-row {
+                flex-direction: column;
+            }
+
+            .filter-btn {
+                width: 100%;
+            }
+
+            .highlights-header h1 {
+                font-size: 28px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Navigation -->
+    <header class="navbar">
+        <div class="container nav-container">
+            <a href="index.html" class="logo">CampusSkill</a>
+            <nav>
+                <a href="dashboard.html">Dashboard</a>
+                <a href="learning-paths.html">Learning Paths</a>
+                <a href="search.html">Find Students</a>
+                <a href="achievements.html">Achievements</a>
+                <a href="requests.html">Requests</a>
+                <a href="profile.html">Profile</a>
+                <a href="index.html" class="logout">Logout</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Highlights Page -->
+    <main class="highlights-page">
+        <div class="highlights-container">
+
+            <div class="highlights-header">
+                <h1>👑 Community Highlights</h1>
+                <p>Featuring our top-rated students and skilled tutors</p>
+            </div>
+
+            <!-- Filter Row -->
+            <div class="filter-row">
+                <button class="filter-btn active" onclick="filterProfiles('all')">All</button>
+                <button class="filter-btn" onclick="filterProfiles('mentors')">Top Mentors</button>
+                <button class="filter-btn" onclick="filterProfiles('new')">Rising Stars</button>
+                <button class="filter-btn" onclick="filterProfiles('highly-rated')">Highly Rated</button>
+            </div>
+
+            <!-- Featured Banner -->
+            <div class="featured-section">
+                <h2>⭐ Become a Featured Tutor</h2>
+                <p>Join our community of top mentors and get recognized for your expertise</p>
+                <a href="profile.html" class="featured-btn">Upgrade Your Profile</a>
+            </div>
+
+            <!-- Profiles Grid -->
+            <div class="profiles-grid">
+
+                <!-- Profile 1 -->
+                <div class="profile-card" data-category="mentors">
+                    <div class="profile-header">
+                        <div class="profile-badge">⭐ Top Mentor</div>
+                        <div class="profile-avatar">AS</div>
+                        <h2 class="profile-name">Ananya Sharma</h2>
+                        <p class="profile-title">Computer Science • 2nd Year</p>
+                        <div class="profile-rating">★★★★★ (4.9/5)</div>
+                    </div>
+                    <div class="profile-content">
+                        <div class="profile-stats">
+                            <div class="stat-item">
+                                <div class="stat-value">24</div>
+                                <div class="stat-label">Students</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-value">128</div>
+                                <div class="stat-label">Hours</div>
+                            </div>
+                        </div>
+
+                        <div class="profile-skills">
+                            <div class="skills-label">Teaching:</div>
+                            <div class="skills-list">
+                                <span class="skill-badge">React</span>
+                                <span class="skill-badge">JavaScript</span>
+                                <span class="skill-badge">Web Dev</span>
+                            </div>
+                        </div>
+
+                        <div class="profile-skills">
+                            <div class="skills-label">Learning:</div>
+                            <div class="skills-list">
+                                <span class="skill-badge">DevOps</span>
+                                <span class="skill-badge">Cloud</span>
+                            </div>
+                        </div>
+
+                        <div class="profile-actions">
+                            <button class="profile-btn btn-view">View Profile</button>
+                            <button class="profile-btn btn-message">Message</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Profile 2 -->
+                <div class="profile-card" data-category="mentors">
+                    <div class="profile-header" style="background: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%);">
+                        <div class="profile-badge">🔥 Rising Star</div>
+                        <div class="profile-avatar">RK</div>
+                        <h2 class="profile-name">Rahul Kumar</h2>
+                        <p class="profile-title">Information Technology • 3rd Year</p>
+                        <div class="profile-rating">★★★★★ (4.8/5)</div>
+                    </div>
+                    <div class="profile-content">
+                        <div class="profile-stats">
+                            <div class="stat-item">
+                                <div class="stat-value">18</div>
+                                <div class="stat-label">Students</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-value">95</div>
+                                <div class="stat-label">Hours</div>
+                            </div>
+                        </div>
+
+                        <div class="profile-skills">
+                            <div class="skills-label">Teaching:</div>
+                            <div class="skills-list">
+                                <span class="skill-badge">Python</span>
+                                <span class="skill-badge">Machine Learning</span>
+                                <span class="skill-badge">Data</span>
+                            </div>
+                        </div>
+
+                        <div class="profile-skills">
+                            <div class="skills-label">Learning:</div>
+                            <div class="skills-list">
+                                <span class="skill-badge">Web Dev</span>
+                                <span class="skill-badge">Frontend</span>
+                            </div>
+                        </div>
+
+                        <div class="profile-actions">
+                            <button class="profile-btn btn-view">View Profile</button>
+                            <button class="profile-btn btn-message">Message</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Profile 3 -->
+                <div class="profile-card" data-category="highly-rated">
+                    <div class="profile-header" style="background: linear-gradient(135deg, #ec4899 0%, #be185d 100%);">
+                        <div class="profile-badge">✨ Highly Rated</div>
+                        <div class="profile-avatar">PM</div>
+                        <h2 class="profile-name">Priya Mehta</h2>
+                        <p class="profile-title">Design • 2nd Year</p>
+                        <div class="profile-rating">★★★★★ (4.9/5)</div>
+                    </div>
+                    <div class="profile-content">
+                        <div class="profile-stats">
+                            <div class="stat-item">
+                                <div class="stat-value">21</div>
+                                <div class="stat-label">Students</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-value">112</div>
+                                <div class="stat-label">Hours</div>
+                            </div>
+                        </div>
+
+                        <div class="profile-skills">
+                            <div class="skills-label">Teaching:</div>
+                            <div class="skills-list">
+                                <span class="skill-badge">UI/UX</span>
+                                <span class="skill-badge">Figma</span>
+                                <span class="skill-badge">Design</span>
+                            </div>
+                        </div>
+
+                        <div class="profile-skills">
+                            <div class="skills-label">Learning:</div>
+                            <div class="skills-list">
+                                <span class="skill-badge">Frontend</span>
+                                <span class="skill-badge">React</span>
+                            </div>
+                        </div>
+
+                        <div class="profile-actions">
+                            <button class="profile-btn btn-view">View Profile</button>
+                            <button class="profile-btn btn-message">Message</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Profile 4 -->
+                <div class="profile-card" data-category="new">
+                    <div class="profile-header" style="background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%);">
+                        <div class="profile-badge">🚀 New Member</div>
+                        <div class="profile-avatar">VK</div>
+                        <h2 class="profile-name">Vikram Kumar</h2>
+                        <p class="profile-title">Computer Science • 1st Year</p>
+                        <div class="profile-rating">★★★★☆ (4.7/5)</div>
+                    </div>
+                    <div class="profile-content">
+                        <div class="profile-stats">
+                            <div class="stat-item">
+                                <div class="stat-value">12</div>
+                                <div class="stat-label">Students</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-value">54</div>
+                                <div class="stat-label">Hours</div>
+                            </div>
+                        </div>
+
+                        <div class="profile-skills">
+                            <div class="skills-label">Teaching:</div>
+                            <div class="skills-list">
+                                <span class="skill-badge">Python</span>
+                                <span class="skill-badge">C++</span>
+                                <span class="skill-badge">DSA</span>
+                            </div>
+                        </div>
+
+                        <div class="profile-skills">
+                            <div class="skills-label">Learning:</div>
+                            <div class="skills-list">
+                                <span class="skill-badge">Web Dev</span>
+                                <span class="skill-badge">Database</span>
+                            </div>
+                        </div>
+
+                        <div class="profile-actions">
+                            <button class="profile-btn btn-view">View Profile</button>
+                            <button class="profile-btn btn-message">Message</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Profile 5 -->
+                <div class="profile-card" data-category="mentors">
+                    <div class="profile-header" style="background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%);">
+                        <div class="profile-badge">👑 Master Tutor</div>
+                        <div class="profile-avatar">SK</div>
+                        <h2 class="profile-name">Sarah Khan</h2>
+                        <p class="profile-title">Electronics • 4th Year</p>
+                        <div class="profile-rating">★★★★★ (5.0/5)</div>
+                    </div>
+                    <div class="profile-content">
+                        <div class="profile-stats">
+                            <div class="stat-item">
+                                <div class="stat-value">32</div>
+                                <div class="stat-label">Students</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-value">187</div>
+                                <div class="stat-label">Hours</div>
+                            </div>
+                        </div>
+
+                        <div class="profile-skills">
+                            <div class="skills-label">Teaching:</div>
+                            <div class="skills-list">
+                                <span class="skill-badge">Arduino</span>
+                                <span class="skill-badge">Embedded</span>
+                                <span class="skill-badge">IoT</span>
+                            </div>
+                        </div>
+
+                        <div class="profile-skills">
+                            <div class="skills-label">Learning:</div>
+                            <div class="skills-list">
+                                <span class="skill-badge">AI/ML</span>
+                                <span class="skill-badge">Python</span>
+                            </div>
+                        </div>
+
+                        <div class="profile-actions">
+                            <button class="profile-btn btn-view">View Profile</button>
+                            <button class="profile-btn btn-message">Message</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Profile 6 -->
+                <div class="profile-card" data-category="highly-rated">
+                    <div class="profile-header" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);">
+                        <div class="profile-badge">🎯 Community Star</div>
+                        <div class="profile-avatar">DJ</div>
+                        <h2 class="profile-name">Disha Jain</h2>
+                        <p class="profile-title">Mechanical • 3rd Year</p>
+                        <div class="profile-rating">★★★★★ (4.8/5)</div>
+                    </div>
+                    <div class="profile-content">
+                        <div class="profile-stats">
+                            <div class="stat-item">
+                                <div class="stat-value">19</div>
+                                <div class="stat-label">Students</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-value">86</div>
+                                <div class="stat-label">Hours</div>
+                            </div>
+                        </div>
+
+                        <div class="profile-skills">
+                            <div class="skills-label">Teaching:</div>
+                            <div class="skills-list">
+                                <span class="skill-badge">CAD</span>
+                                <span class="skill-badge">Solidworks</span>
+                                <span class="skill-badge">3D</span>
+                            </div>
+                        </div>
+
+                        <div class="profile-skills">
+                            <div class="skills-label">Learning:</div>
+                            <div class="skills-list">
+                                <span class="skill-badge">Python</span>
+                                <span class="skill-badge">Robotics</span>
+                            </div>
+                        </div>
+
+                        <div class="profile-actions">
+                            <button class="profile-btn btn-view">View Profile</button>
+                            <button class="profile-btn btn-message">Message</button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Testimonials -->
+            <div class="testimonials-area">
+                <h2 class="section-title">💬 What Students Say</h2>
+                <div class="testimonials-grid">
+
+                    <div class="testimonial-card">
+                        <div class="testimonial-rating">★★★★★</div>
+                        <p class="testimonial-text">"Ananya is an amazing React tutor! Very patient and explains concepts perfectly. I learned so much!"</p>
+                        <p class="testimonial-author">- Alex Rodriguez</p>
+                    </div>
+
+                    <div class="testimonial-card">
+                        <div class="testimonial-rating">★★★★★</div>
+                        <p class="testimonial-text">"Rahul's ML explanations are crystal clear. Highly recommended for anyone starting with data science!"</p>
+                        <p class="testimonial-author">- Emma Wilson</p>
+                    </div>
+
+                    <div class="testimonial-card">
+                        <div class="testimonial-rating">★★★★★</div>
+                        <p class="testimonial-text">"Priya's UI/UX design course changed my perspective. She's truly talented and dedicated!"</p>
+                        <p class="testimonial-author">- Michael Chen</p>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p>© 2026 CampusSkill. Learn together. Grow together.</p>
+        </div>
+    </footer>
+
+    <script>
+        function filterProfiles(category) {
+            const cards = document.querySelectorAll('.profile-card');
+            const buttons = document.querySelectorAll('.filter-btn');
+
+            // Update active button
+            buttons.forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+
+            // Filter cards
+            cards.forEach(card => {
+                if (category === 'all' || card.dataset.category === category) {
+                    card.style.display = '';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+    </script>
+
+</body>
+</html>

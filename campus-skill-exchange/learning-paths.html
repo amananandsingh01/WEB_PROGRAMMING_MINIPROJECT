@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Learning Paths - CampusSkill</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <style>
+        .learning-paths-page {
+            background: #f8f9fc;
+            min-height: calc(100vh - 80px);
+            padding: 50px 0;
+        }
+
+        .paths-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .paths-header {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        .paths-header h1 {
+            font-size: 36px;
+            color: #1e293b;
+            margin-bottom: 10px;
+        }
+
+        .paths-header p {
+            font-size: 16px;
+            color: #64748b;
+            margin-bottom: 30px;
+        }
+
+        .filter-tabs {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 40px;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            padding: 10px 20px;
+            border: 2px solid #cbd5e1;
+            background: white;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            color: #64748b;
+            transition: 0.3s ease;
+        }
+
+        .filter-btn.active {
+            background: #3b82f6;
+            color: white;
+            border-color: #3b82f6;
+        }
+
+        .filter-btn:hover {
+            border-color: #3b82f6;
+            color: #3b82f6;
+        }
+
+        .paths-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 24px;
+            margin-bottom: 50px;
+        }
+
+        .path-card {
+            background: white;
+            border: 2px solid #e2e8f0;
+            border-radius: 14px;
+            overflow: hidden;
+            transition: 0.3s ease;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .path-card:hover {
+            box-shadow: 0 12px 28px rgba(59, 130, 246, 0.12);
+            border-color: #3b82f6;
+            transform: translateY(-4px);
+        }
+
+        .path-header {
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            color: white;
+            padding: 24px;
+            text-align: center;
+        }
+
+        .path-icon {
+            font-size: 3.5rem;
+            margin-bottom: 12px;
+        }
+
+        .path-title {
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .path-subtitle {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .path-content {
+            padding: 24px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .path-info {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 20px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .info-item {
+            text-align: center;
+        }
+
+        .info-label {
+            font-size: 12px;
+            color: #64748b;
+            font-weight: 500;
+            margin-bottom: 4px;
+        }
+
+        .info-value {
+            font-size: 16px;
+            color: #1e293b;
+            font-weight: 600;
+        }
+
+        .path-description {
+            font-size: 14px;
+            color: #64748b;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        .skills-list {
+            margin-bottom: 20px;
+        }
+
+        .skills-label {
+            font-size: 13px;
+            font-weight: 600;
+            color: #1e293b;
+            margin-bottom: 10px;
+        }
+
+        .skills-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .skill-tag {
+            background: #f0f4ff;
+            color: #3b82f6;
+            padding: 6px 12px;
+            border-radius: 16px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .progress-info {
+            margin-bottom: 20px;
+        }
+
+        .progress-bar {
+            height: 8px;
+            background: #e2e8f0;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-top: 8px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #3b82f6, #2563eb);
+            border-radius: 10px;
+            transition: width 0.3s ease;
+        }
+
+        .path-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: auto;
+        }
+
+        .path-btn {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.3s ease;
+            font-size: 14px;
+        }
+
+        .btn-start {
+            background: #3b82f6;
+            color: white;
+        }
+
+        .btn-start:hover {
+            background: #2563eb;
+        }
+
+        .btn-view {
+            background: white;
+            color: #3b82f6;
+            border: 2px solid #3b82f6;
+        }
+
+        .btn-view:hover {
+            background: #f0f4ff;
+        }
+
+        .difficulty-badge {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-top: 12px;
+        }
+
+        .difficulty-beginner {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .difficulty-intermediate {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .difficulty-advanced {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .testimonials-section {
+            background: white;
+            border-radius: 14px;
+            padding: 40px;
+            margin-top: 50px;
+        }
+
+        .section-title {
+            font-size: 24px;
+            color: #1e293b;
+            margin-bottom: 30px;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        .testimonials-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .testimonial {
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .testimonial-rating {
+            font-size: 16px;
+            margin-bottom: 10px;
+            color: #f59e0b;
+        }
+
+        .testimonial-text {
+            font-size: 14px;
+            color: #64748b;
+            margin-bottom: 15px;
+            line-height: 1.6;
+            font-style: italic;
+        }
+
+        .testimonial-author {
+            font-weight: 600;
+            color: #1e293b;
+            font-size: 14px;
+        }
+
+        @media (max-width: 768px) {
+            .paths-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .path-info {
+                grid-template-columns: 1fr;
+            }
+
+            .paths-header h1 {
+                font-size: 28px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Navigation -->
+    <header class="navbar">
+        <div class="container nav-container">
+            <a href="index.html" class="logo">CampusSkill</a>
+            <nav>
+                <a href="dashboard.html">Dashboard</a>
+                <a href="learning-paths.html" class="active">Learning Paths</a>
+                <a href="search.html">Find Students</a>
+                <a href="achievements.html">Achievements</a>
+                <a href="community-highlights.html">Community</a>
+                <a href="requests.html">Requests</a>
+                <a href="profile.html">Profile</a>
+                <a href="index.html" class="logout">Logout</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Learning Paths Page -->
+    <main class="learning-paths-page">
+        <div class="paths-container">
+
+            <div class="paths-header">
+                <h1>📚 Learning Paths</h1>
+                <p>Structured skill-building journeys designed by our community</p>
+            </div>
+
+            <!-- Filter Tabs -->
+            <div class="filter-tabs">
+                <button class="filter-btn active" onclick="filterPaths('all')">All Paths</button>
+                <button class="filter-btn" onclick="filterPaths('beginner')">Beginner</button>
+                <button class="filter-btn" onclick="filterPaths('intermediate')">Intermediate</button>
+                <button class="filter-btn" onclick="filterPaths('advanced')">Advanced</button>
+                <button class="filter-btn" onclick="filterPaths('popular')">Most Popular</button>
+            </div>
+
+            <!-- Learning Paths Grid -->
+            <div class="paths-grid">
+
+                <!-- Web Development Path -->
+                <div class="path-card" data-difficulty="beginner">
+                    <div class="path-header">
+                        <div class="path-icon">🌐</div>
+                        <h2 class="path-title">Web Development</h2>
+                        <p class="path-subtitle">Learn frontend to backend</p>
+                    </div>
+                    <div class="path-content">
+                        <div class="path-info">
+                            <div class="info-item">
+                                <div class="info-label">Duration</div>
+                                <div class="info-value">12 weeks</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">Students</div>
+                                <div class="info-value">456</div>
+                            </div>
+                        </div>
+
+                        <p class="path-description">Master HTML, CSS, JavaScript, React, and Node.js through guided learning with experienced peers.</p>
+
+                        <div class="skills-list">
+                            <div class="skills-label">Skills Covered:</div>
+                            <div class="skills-tags">
+                                <span class="skill-tag">HTML</span>
+                                <span class="skill-tag">CSS</span>
+                                <span class="skill-tag">JavaScript</span>
+                                <span class="skill-tag">React</span>
+                            </div>
+                        </div>
+
+                        <div class="progress-info">
+                            <div class="info-label">Your Progress</div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 35%"></div>
+                            </div>
+                            <small style="color: #64748b;">3 of 12 courses completed</small>
+                        </div>
+
+                        <div class="difficulty-badge difficulty-beginner">Beginner Friendly</div>
+
+                        <div class="path-buttons">
+                            <button class="path-btn btn-start">Continue</button>
+                            <button class="path-btn btn-view">View Path</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Data Science Path -->
+                <div class="path-card" data-difficulty="intermediate">
+                    <div class="path-header" style="background: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%);">
+                        <div class="path-icon">📊</div>
+                        <h2 class="path-title">Data Science</h2>
+                        <p class="path-subtitle">From data to insights</p>
+                    </div>
+                    <div class="path-content">
+                        <div class="path-info">
+                            <div class="info-item">
+                                <div class="info-label">Duration</div>
+                                <div class="info-value">14 weeks</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">Students</div>
+                                <div class="info-value">324</div>
+                            </div>
+                        </div>
+
+                        <p class="path-description">Learn Python, pandas, NumPy, machine learning, and data visualization with real-world projects.</p>
+
+                        <div class="skills-list">
+                            <div class="skills-label">Skills Covered:</div>
+                            <div class="skills-tags">
+                                <span class="skill-tag">Python</span>
+                                <span class="skill-tag">ML</span>
+                                <span class="skill-tag">Statistics</span>
+                                <span class="skill-tag">Pandas</span>
+                            </div>
+                        </div>
+
+                        <div class="progress-info">
+                            <div class="info-label">Your Progress</div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 0%"></div>
+                            </div>
+                            <small style="color: #64748b;">Not started</small>
+                        </div>
+
+                        <div class="difficulty-badge difficulty-intermediate">Intermediate</div>
+
+                        <div class="path-buttons">
+                            <button class="path-btn btn-start">Start</button>
+                            <button class="path-btn btn-view">View Path</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- UI/UX Design Path -->
+                <div class="path-card" data-difficulty="beginner">
+                    <div class="path-header" style="background: linear-gradient(135deg, #ec4899 0%, #be185d 100%);">
+                        <div class="path-icon">🎨</div>
+                        <h2 class="path-title">UI/UX Design</h2>
+                        <p class="path-subtitle">Design beautiful interfaces</p>
+                    </div>
+                    <div class="path-content">
+                        <div class="path-info">
+                            <div class="info-item">
+                                <div class="info-label">Duration</div>
+                                <div class="info-value">10 weeks</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">Students</div>
+                                <div class="info-value">532</div>
+                            </div>
+                        </div>
+
+                        <p class="path-description">Master design principles, Figma, prototyping, and user research to create amazing user experiences.</p>
+
+                        <div class="skills-list">
+                            <div class="skills-label">Skills Covered:</div>
+                            <div class="skills-tags">
+                                <span class="skill-tag">Figma</span>
+                                <span class="skill-tag">Design</span>
+                                <span class="skill-tag">Wireframe</span>
+                                <span class="skill-tag">Prototype</span>
+                            </div>
+                        </div>
+
+                        <div class="progress-info">
+                            <div class="info-label">Your Progress</div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 60%"></div>
+                            </div>
+                            <small style="color: #64748b;">6 of 10 courses completed</small>
+                        </div>
+
+                        <div class="difficulty-badge difficulty-beginner">Beginner Friendly</div>
+
+                        <div class="path-buttons">
+                            <button class="path-btn btn-start">Continue</button>
+                            <button class="path-btn btn-view">View Path</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Mobile App Development -->
+                <div class="path-card" data-difficulty="advanced">
+                    <div class="path-header" style="background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%);">
+                        <div class="path-icon">📱</div>
+                        <h2 class="path-title">Mobile App Dev</h2>
+                        <p class="path-subtitle">Build apps for iOS & Android</p>
+                    </div>
+                    <div class="path-content">
+                        <div class="path-info">
+                            <div class="info-item">
+                                <div class="info-label">Duration</div>
+                                <div class="info-value">16 weeks</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">Students</div>
+                                <div class="info-value">278</div>
+                            </div>
+                        </div>
+
+                        <p class="path-description">Learn React Native and Flutter to build cross-platform mobile applications with hands-on projects.</p>
+
+                        <div class="skills-list">
+                            <div class="skills-label">Skills Covered:</div>
+                            <div class="skills-tags">
+                                <span class="skill-tag">React Native</span>
+                                <span class="skill-tag">Flutter</span>
+                                <span class="skill-tag">Mobile</span>
+                            </div>
+                        </div>
+
+                        <div class="progress-info">
+                            <div class="info-label">Your Progress</div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 0%"></div>
+                            </div>
+                            <small style="color: #64748b;">Not started</small>
+                        </div>
+
+                        <div class="difficulty-badge difficulty-advanced">Advanced</div>
+
+                        <div class="path-buttons">
+                            <button class="path-btn btn-start">Start</button>
+                            <button class="path-btn btn-view">View Path</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Cloud Computing Path -->
+                <div class="path-card" data-difficulty="intermediate">
+                    <div class="path-header" style="background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%);">
+                        <div class="path-icon">☁️</div>
+                        <h2 class="path-title">Cloud Computing</h2>
+                        <p class="path-subtitle">AWS, GCP & Azure</p>
+                    </div>
+                    <div class="path-content">
+                        <div class="path-info">
+                            <div class="info-item">
+                                <div class="info-label">Duration</div>
+                                <div class="info-value">12 weeks</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">Students</div>
+                                <div class="info-value">189</div>
+                            </div>
+                        </div>
+
+                        <p class="path-description">Master cloud platforms, deployment, DevOps, and infrastructure management for scalable applications.</p>
+
+                        <div class="skills-list">
+                            <div class="skills-label">Skills Covered:</div>
+                            <div class="skills-tags">
+                                <span class="skill-tag">AWS</span>
+                                <span class="skill-tag">DevOps</span>
+                                <span class="skill-tag">Docker</span>
+                            </div>
+                        </div>
+
+                        <div class="progress-info">
+                            <div class="info-label">Your Progress</div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 0%"></div>
+                            </div>
+                            <small style="color: #64748b;">Not started</small>
+                        </div>
+
+                        <div class="difficulty-badge difficulty-intermediate">Intermediate</div>
+
+                        <div class="path-buttons">
+                            <button class="path-btn btn-start">Start</button>
+                            <button class="path-btn btn-view">View Path</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Cybersecurity Path -->
+                <div class="path-card" data-difficulty="advanced">
+                    <div class="path-header" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);">
+                        <div class="path-icon">🔒</div>
+                        <h2 class="path-title">Cybersecurity</h2>
+                        <p class="path-subtitle">Protect systems & data</p>
+                    </div>
+                    <div class="path-content">
+                        <div class="path-info">
+                            <div class="info-item">
+                                <div class="info-label">Duration</div>
+                                <div class="info-value">14 weeks</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">Students</div>
+                                <div class="info-value">156</div>
+                            </div>
+                        </div>
+
+                        <p class="path-description">Learn network security, penetration testing, encryption, and ethical hacking practices in depth.</p>
+
+                        <div class="skills-list">
+                            <div class="skills-label">Skills Covered:</div>
+                            <div class="skills-tags">
+                                <span class="skill-tag">Security</span>
+                                <span class="skill-tag">Encryption</span>
+                                <span class="skill-tag">Hacking</span>
+                            </div>
+                        </div>
+
+                        <div class="progress-info">
+                            <div class="info-label">Your Progress</div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 0%"></div>
+                            </div>
+                            <small style="color: #64748b;">Not started</small>
+                        </div>
+
+                        <div class="difficulty-badge difficulty-advanced">Advanced</div>
+
+                        <div class="path-buttons">
+                            <button class="path-btn btn-start">Start</button>
+                            <button class="path-btn btn-view">View Path</button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Testimonials Section -->
+            <div class="testimonials-section">
+                <h2 class="section-title">⭐ Student Success Stories</h2>
+                <div class="testimonials-grid">
+
+                    <div class="testimonial">
+                        <div class="testimonial-rating">★★★★★</div>
+                        <p class="testimonial-text">"The Web Development path helped me transition into a tech career. The community support was incredible!"</p>
+                        <p class="testimonial-author">- Ananya Sharma</p>
+                    </div>
+
+                    <div class="testimonial">
+                        <div class="testimonial-rating">★★★★★</div>
+                        <p class="testimonial-text">"I completed the Data Science path and landed my first ML role. Highly recommended!"</p>
+                        <p class="testimonial-author">- Rahul Kumar</p>
+                    </div>
+
+                    <div class="testimonial">
+                        <div class="testimonial-rating">★★★★★</div>
+                        <p class="testimonial-text">"The UI/UX Design path gave me the confidence to start freelancing. Amazing structured curriculum!"</p>
+                        <p class="testimonial-author">- Priya Mehta</p>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p>© 2026 CampusSkill. Learn together. Grow together.</p>
+        </div>
+    </footer>
+
+    <script>
+        function filterPaths(difficulty) {
+            const cards = document.querySelectorAll('.path-card');
+            const buttons = document.querySelectorAll('.filter-btn');
+
+            // Update active button
+            buttons.forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+
+            // Filter cards
+            cards.forEach(card => {
+                if (difficulty === 'all' || card.dataset.difficulty === difficulty) {
+                    card.style.display = '';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+    </script>
+
+</body>
+</html>

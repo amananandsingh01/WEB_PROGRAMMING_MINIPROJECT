@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Achievements - CampusSkill</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <style>
+        .achievements-page {
+            background: #f8f9fc;
+            min-height: calc(100vh - 80px);
+            padding: 50px 0;
+        }
+
+        .achievements-container {
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        .achievements-header {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        .achievements-header h1 {
+            font-size: 36px;
+            color: #1e293b;
+            margin-bottom: 10px;
+        }
+
+        .achievements-header p {
+            font-size: 16px;
+            color: #64748b;
+        }
+
+        .badges-section {
+            margin-bottom: 50px;
+        }
+
+        .section-title {
+            font-size: 22px;
+            color: #1e293b;
+            margin-bottom: 30px;
+            font-weight: 600;
+            border-bottom: 3px solid #3b82f6;
+            padding-bottom: 12px;
+        }
+
+        .badges-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        .badge-item {
+            background: white;
+            border: 2px solid #e2e8f0;
+            border-radius: 14px;
+            padding: 24px;
+            text-align: center;
+            transition: 0.3s ease;
+            cursor: pointer;
+        }
+
+        .badge-item:hover:not(.locked) {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 24px rgba(59, 130, 246, 0.15);
+            border-color: #3b82f6;
+        }
+
+        .badge-item.locked {
+            opacity: 0.5;
+            background: #f1f5f9;
+        }
+
+        .badge-icon-lg {
+            font-size: 4rem;
+            margin-bottom: 15px;
+            display: block;
+        }
+
+        .badge-item h3 {
+            margin: 0 0 8px;
+            font-size: 18px;
+            color: #1e293b;
+            font-weight: 600;
+        }
+
+        .badge-item .description {
+            font-size: 14px;
+            color: #64748b;
+            margin-bottom: 15px;
+            line-height: 1.5;
+        }
+
+        .badge-progress {
+            background: #e2e8f0;
+            height: 8px;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 8px;
+        }
+
+        .badge-progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #3b82f6, #2563eb);
+            border-radius: 10px;
+        }
+
+        .badge-status {
+            font-size: 12px;
+            color: #64748b;
+            font-weight: 500;
+        }
+
+        .earned {
+            background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+            border-color: #93c5fd;
+        }
+
+        .earned .badge-status {
+            color: #0c4a6e;
+        }
+
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .stat-box {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 25px;
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 36px;
+            color: #3b82f6;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            color: #64748b;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .badge-details {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.6);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .badge-details.active {
+            display: flex;
+        }
+
+        .badge-details-content {
+            background: white;
+            border-radius: 16px;
+            padding: 40px;
+            max-width: 500px;
+            text-align: center;
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .badge-details-close {
+            float: right;
+            font-size: 28px;
+            color: #cbd5e1;
+            cursor: pointer;
+            line-height: 1;
+        }
+
+        .badge-details-close:hover {
+            color: #64748b;
+        }
+
+        @media (max-width: 768px) {
+            .badges-grid {
+                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            }
+
+            .badge-item {
+                padding: 18px;
+            }
+
+            .badge-icon-lg {
+                font-size: 3rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Navigation -->
+    <header class="navbar">
+        <div class="container nav-container">
+            <a href="index.html" class="logo">CampusSkill</a>
+            <nav>
+                <a href="dashboard.html">Dashboard</a>
+                <a href="learning-paths.html">Learning Paths</a>
+                <a href="search.html">Find Students</a>
+                <a href="achievements.html" class="active">Achievements</a>
+                <a href="community-highlights.html">Community</a>
+                <a href="requests.html">Requests</a>
+                <a href="profile.html">Profile</a>
+                <a href="index.html" class="logout">Logout</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Achievements Page -->
+    <main class="achievements-page">
+        <div class="achievements-container">
+
+            <div class="achievements-header">
+                <h1>🏆 Your Achievements</h1>
+                <p>Track your milestones and unlock badges as you grow in your learning journey</p>
+            </div>
+
+            <!-- Stats -->
+            <div class="stats-row">
+                <div class="stat-box">
+                    <div class="stat-number">5</div>
+                    <div class="stat-label">Badges Earned</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-number">12</div>
+                    <div class="stat-label">Total Hours Learned</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-number">8</div>
+                    <div class="stat-label">Skills Improved</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-number">4.8/5</div>
+                    <div class="stat-label">Average Rating</div>
+                </div>
+            </div>
+
+            <!-- Earned Badges -->
+            <div class="badges-section">
+                <h2 class="section-title">✨ Badges Earned</h2>
+                <div class="badges-grid">
+
+                    <div class="badge-item earned" onclick="showBadgeDetails(this)">
+                        <span class="badge-icon-lg">🌟</span>
+                        <h3>Quick Learner</h3>
+                        <p class="description">Completed 5 skill exchanges</p>
+                        <div class="badge-status">Earned on Aug 25, 2026</div>
+                    </div>
+
+                    <div class="badge-item earned" onclick="showBadgeDetails(this)">
+                        <span class="badge-icon-lg">👨‍🏫</span>
+                        <h3>Mentor</h3>
+                        <p class="description">Taught 3+ students</p>
+                        <div class="badge-status">Earned on Aug 23, 2026</div>
+                    </div>
+
+                    <div class="badge-item earned" onclick="showBadgeDetails(this)">
+                        <span class="badge-icon-lg">🎯</span>
+                        <h3>Goal Setter</h3>
+                        <p class="description">Listed 5+ skills</p>
+                        <div class="badge-status">Earned on Aug 20, 2026</div>
+                    </div>
+
+                    <div class="badge-item earned" onclick="showBadgeDetails(this)">
+                        <span class="badge-icon-lg">⭐</span>
+                        <h3>Five Star</h3>
+                        <p class="description">Received 3 five-star reviews</p>
+                        <div class="badge-status">Earned on Aug 18, 2026</div>
+                    </div>
+
+                    <div class="badge-item earned" onclick="showBadgeDetails(this)">
+                        <span class="badge-icon-lg">🤝</span>
+                        <h3>Collaborator</h3>
+                        <p class="description">Connected with 10 students</p>
+                        <div class="badge-status">Earned on Aug 15, 2026</div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- In Progress Badges -->
+            <div class="badges-section">
+                <h2 class="section-title">🎯 In Progress</h2>
+                <div class="badges-grid">
+
+                    <div class="badge-item" onclick="showBadgeDetails(this)">
+                        <span class="badge-icon-lg">🚀</span>
+                        <h3>Master</h3>
+                        <p class="description">Complete 10 skill exchanges</p>
+                        <div class="badge-progress">
+                            <div class="badge-progress-fill" style="width: 50%"></div>
+                        </div>
+                        <div class="badge-status">5 of 10 completed</div>
+                    </div>
+
+                    <div class="badge-item" onclick="showBadgeDetails(this)">
+                        <span class="badge-icon-lg">📚</span>
+                        <h3>Scholar</h3>
+                        <p class="description">Complete 20 skill exchanges</p>
+                        <div class="badge-progress">
+                            <div class="badge-progress-fill" style="width: 25%"></div>
+                        </div>
+                        <div class="badge-status">5 of 20 completed</div>
+                    </div>
+
+                    <div class="badge-item" onclick="showBadgeDetails(this)">
+                        <span class="badge-icon-lg">💎</span>
+                        <h3>Expert</h3>
+                        <p class="description">Reach 50+ hours of learning</p>
+                        <div class="badge-progress">
+                            <div class="badge-progress-fill" style="width: 24%"></div>
+                        </div>
+                        <div class="badge-status">12 of 50 hours</div>
+                    </div>
+
+                    <div class="badge-item" onclick="showBadgeDetails(this)">
+                        <span class="badge-icon-lg">🎓</span>
+                        <h3>Legend</h3>
+                        <p class="description">Earn 10 badges total</p>
+                        <div class="badge-progress">
+                            <div class="badge-progress-fill" style="width: 50%"></div>
+                        </div>
+                        <div class="badge-status">5 of 10 badges</div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Locked Badges -->
+            <div class="badges-section">
+                <h2 class="section-title">🔒 Locked Badges</h2>
+                <div class="badges-grid">
+
+                    <div class="badge-item locked" onclick="showBadgeDetails(this)">
+                        <span class="badge-icon-lg">👑</span>
+                        <h3>Champion</h3>
+                        <p class="description">Win 5 skill rating competitions</p>
+                        <div class="badge-status">Not yet earned</div>
+                    </div>
+
+                    <div class="badge-item locked" onclick="showBadgeDetails(this)">
+                        <span class="badge-icon-lg">🌍</span>
+                        <h3>Global Citizen</h3>
+                        <p class="description">Learn from 15+ different students</p>
+                        <div class="badge-status">Not yet earned</div>
+                    </div>
+
+                    <div class="badge-item locked" onclick="showBadgeDetails(this)">
+                        <span class="badge-icon-lg">⚡</span>
+                        <h3>Speed Learner</h3>
+                        <p class="description">Complete 3 skills in 1 month</p>
+                        <div class="badge-status">Not yet earned</div>
+                    </div>
+
+                    <div class="badge-item locked" onclick="showBadgeDetails(this)">
+                        <span class="badge-icon-lg">🎨</span>
+                        <h3>Creative</h3>
+                        <p class="description">Master 3+ creative skills</p>
+                        <div class="badge-status">Not yet earned</div>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Badge Details Modal -->
+    <div class="badge-details" id="badgeDetailsModal">
+        <div class="badge-details-content">
+            <span class="badge-details-close" onclick="closeBadgeDetails()">×</span>
+            <h2>Badge Details</h2>
+            <p id="badgeDetailsText">Loading...</p>
+            <button class="primary-btn full-btn" onclick="closeBadgeDetails()">Close</button>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p>© 2026 CampusSkill. Learn together. Grow together.</p>
+        </div>
+    </footer>
+
+    <script>
+        function showBadgeDetails(element) {
+            const title = element.querySelector('h3').textContent;
+            const description = element.querySelector('.description').textContent;
+            const status = element.querySelector('.badge-status').textContent;
+            
+            document.getElementById('badgeDetailsText').innerHTML = 
+                `<strong>${title}</strong><br>${description}<br><small style="color: #64748b;">${status}</small>`;
+            
+            document.getElementById('badgeDetailsModal').classList.add('active');
+        }
+
+        function closeBadgeDetails() {
+            document.getElementById('badgeDetailsModal').classList.remove('active');
+        }
+
+        // Close modal when clicking outside
+        document.getElementById('badgeDetailsModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeBadgeDetails();
+            }
+        });
+    </script>
+
+</body>
+</html>
