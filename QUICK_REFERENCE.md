@@ -350,17 +350,3 @@ Before going live:
 - [ ] Load time is acceptable
 
 ---
-
-## 📞 Support
-
-For issues or questions:
-1. Check WEBSITE_ENHANCEMENTS.md for feature details
-2. Review relevant HTML file structure
-3. Check CSS for styling issues
-4. Test in browser DevTools
-
----
-
-Happy learning! 🎓✨
-
-Last Updated: August 29, 2026
