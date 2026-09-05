@@ -1,4 +1,4 @@
-﻿# Campus Skill Exchange
+# Campus Skill Exchange
 
 A peer-to-peer skill exchange platform for college students. Students can register, log in, discover tutors, send collaboration requests, and track their learning journey.
 
@@ -27,106 +27,127 @@ Make sure the following are installed on your machine:
 
 ## Setup & Execution Steps
 
-### Step 1 - Clone or Download the Project
+### Step 1 — Clone or Download the Project
 
-`ash
+```bash
 git clone https://github.com/your-username/WEB_PROGRAMMING_MINIPROJECT.git
 cd WEB_PROGRAMMING_MINIPROJECT
-`
+```
 
-> Or simply extract the ZIP and open the folder.
+> Or simply extract the project folder and open it.
 
 ---
 
-### Step 2 - Set Up the PostgreSQL Database
+### Step 2 — Set Up PostgreSQL Database & Seed Data
 
 1. Open **pgAdmin** or the **psql** command-line tool.
-2. Create a new database:
+2. Create a new database named `wpproj`:
 
-`sql
+```sql
 CREATE DATABASE wpproj;
-`
+```
 
-3. Connect to the database and run the initialisation script to create all tables:
+3. Connect to the `wpproj` database and execute the initialization script:
 
-`ash
+```bash
 psql -U postgres -d wpproj -f backend/database/init.sql
-`
+```
 
-> On Windows you can also open ackend/database/init.sql in pgAdmin's Query Tool and execute it manually.
+> **Using pgAdmin (GUI):**
+> 1. Expand **Databases** → right-click **wpproj** → click **Query Tool**.
+> 2. Open `backend/database/init.sql` (or copy/paste its entire content).
+> 3. Click **Execute (F5)**.
+> 
+> This creates all tables and automatically seeds **20 realistic student profiles** (with skills, departments, bios, and active interconnections). The default login password for all demo accounts is `password123`.
 
 ---
 
-### Step 3 - Configure Environment Variables
+### Step 3 — Configure Environment Variables (.env)
 
-Open ackend/.env and update the values to match your local PostgreSQL setup:
+For security reasons, `.env` contains sensitive passwords and secrets and is intentionally excluded from Git via `.gitignore`. 
 
-`env
+A safe template [`backend/.env.example`](backend/.env.example) is provided. Create your `.env` file from this template:
+
+**On Windows (PowerShell):**
+```powershell
+Copy-Item backend/.env.example -Destination backend/.env
+```
+
+**On macOS / Linux:**
+```bash
+cp backend/.env.example backend/.env
+```
+
+Open `backend/.env` and update the parameters to match your local PostgreSQL credentials:
+
+```env
 PORT=5000
 DB_USER=postgres
-DB_PASSWORD=your_postgres_password
+DB_PASSWORD=your_postgres_password_here
 DB_HOST=localhost
 DB_PORT=5432
 DB_NAME=wpproj
 JWT_SECRET=super_secret_jwt_key_2026
-`
+```
 
-> **Important:** Change DB_PASSWORD to match your actual PostgreSQL password.
+> **Note:**
+> - Set `DB_PASSWORD` to your actual PostgreSQL superuser password.
+> - Ensure `DB_NAME` matches the database you created in Step 2 (`wpproj`).
 
 ---
 
-### Step 4 - Install Backend Dependencies
+### Step 4 — Install Backend Dependencies
 
-Open a terminal, navigate to the backend folder, and install packages:
+Open a terminal in the `backend/` directory and install the required npm packages:
 
-`ash
+```bash
 cd backend
 npm install
-`
+```
 
 ---
 
-### Step 5 - Start the Backend Server
+### Step 5 — Start the Backend Server
 
-**For development** (auto-restarts on file changes):
-
-`ash
+**For development (auto-restarts on file changes via nodemon):**
+```bash
 npm run dev
-`
+```
 
 **For production:**
-
-`ash
+```bash
 npm start
-`
+```
 
 You should see:
-
-`
-Server running on port 5000
-`
-
-> The backend API will be available at http://localhost:5000.
+```
+Server running on http://localhost:5000
+```
 
 ---
 
-### Step 6 - Open the Frontend
+### Step 6 — Run and Access the Application
 
-Simply open the main page in your browser:
+> ⚠️ **IMPORTANT — DO NOT OPEN AS A LOCAL FILE (`file:///`):**
+> You cannot simply double-click `campus-skill-exchange/index.html` from File Explorer. Modern web browsers enforce strict security and Cross-Origin Resource Sharing (CORS) restrictions on `file:///` URLs, which will block API requests and local storage handling. **You must access the app through a `localhost` web address.**
 
-`
-campus-skill-exchange/index.html
-`
+#### Option A (Recommended — Direct via Backend Server):
+Since the backend server serves the frontend static files automatically, simply open your browser and go to:
+👉 **[http://localhost:5000](http://localhost:5000)**
+*(or http://localhost:5000/campus-skill-exchange/index.html)*
 
-You can double-click the file in File Explorer, or drag it into your browser.
-
-> **No additional build step is needed** - the frontend is plain HTML/CSS/JS.
+#### Option B (Using VS Code Live Server):
+If you prefer running a dedicated frontend development server:
+1. Open the project in VS Code.
+2. Install the **Live Server** extension (by Ritwick Dey).
+3. Right-click `campus-skill-exchange/index.html` → select **"Open with Live Server"**.
+4. Your browser will open the app at `http://127.0.0.1:5500/campus-skill-exchange/index.html`.
 
 ---
 
 ## Project Structure
 
-`
+```
 WEB_PROGRAMMING_MINIPROJECT/
 |
 +-- campus-skill-exchange/         <- Frontend HTML pages
@@ -156,85 +177,63 @@ WEB_PROGRAMMING_MINIPROJECT/
 |   |   +-- init.sql               (PostgreSQL schema - run this first)
 |   +-- src/
 |       +-- config/
-|       |   +-- db.js              (PostgreSQL connection pool)
+|       |   +-- db.js                  (PostgreSQL connection pool)
+|       +-- middleware/
+|       |   +-- auth.js                (JWT authentication middleware)
 |       +-- controllers/
-|       |   +-- authController.js  (Register & Login logic)
-|       |   +-- requestController.js (Skill request logic)
+|       |   +-- authController.js      (Register, Login, getMe logic)
+|       |   +-- userController.js      (Student search & profile query)
+|       |   +-- skillController.js     (Skills CRUD & profile update)
+|       |   +-- requestController.js   (Connection requests CRUD)
 |       +-- routes/
-|           +-- authRoutes.js
-|           +-- requestRoutes.js
+|           +-- authRoutes.js          (POST /register, /login)
+|           +-- userRoutes.js          (GET /search, /:id)
+|           +-- profileRoutes.js       (GET/PUT /me, skills CRUD)
+|           +-- requestRoutes.js       (GET, POST, PUT, DELETE requests)
 |
++-- backend/.env.example               (Safe template for environment variables)
++-- .gitignore                         (Protects .env, node_modules, logs)
 +-- README.md
-`
+```
 
 ---
 
 ## API Endpoints
 
-| Method | Endpoint             | Description                     | Auth Required |
-|--------|----------------------|---------------------------------|---------------|
-| POST   | /api/auth/register   | Register a new user             | No            |
-| POST   | /api/auth/login      | Login and receive a JWT token   | No            |
-| POST   | /api/requests        | Create a new skill-swap request | Yes (JWT)     |
-
-### Register - Request Body
-`json
-{
-  "username": "Aditi Verma",
-  "email": "aditi@college.edu",
-  "password": "yourpassword"
-}
-`
-
-### Login - Request Body
-`json
-{
-  "email": "aditi@college.edu",
-  "password": "yourpassword"
-}
-`
-
-### Login - Response
-`json
-{
-  "token": "<JWT token>",
-  "user": {
-    "id": "<uuid>",
-    "username": "Aditi Verma"
-  }
-}
-`
-
-> The JWT token is automatically stored in localStorage by the frontend after a successful login.
+| Method | Endpoint | Description | Auth Required |
+|---|---|---|---|
+| **POST** | `/api/auth/register` | Register a new user | No |
+| **POST** | `/api/auth/login` | Login and receive a JWT token | No |
+| **GET** | `/api/profile/me` | Fetch logged-in user profile | Yes (JWT) |
+| **PUT** | `/api/profile/update` | Update bio, department, year | Yes (JWT) |
+| **GET** | `/api/profile/skills` | Get offering & learning skills | Yes (JWT) |
+| **POST** | `/api/profile/skills` | Add an offering or learning skill | Yes (JWT) |
+| **DELETE** | `/api/profile/skills/:skillId/:type` | Remove a skill | Yes (JWT) |
+| **GET** | `/api/users/search` | Search students by name, skill, dept | Yes (JWT) |
+| **GET** | `/api/users/:id` | Get specific student profile & skills | Yes (JWT) |
+| **GET** | `/api/requests` | Get incoming & outgoing requests | Yes (JWT) |
+| **POST** | `/api/requests` | Send a collaboration request | Yes (JWT) |
+| **PUT** | `/api/requests/:id` | Accept or decline incoming request | Yes (JWT) |
+| **DELETE** | `/api/requests/:id` | Cancel request or remove connection | Yes (JWT) |
 
 ---
 
-## How Authentication Works
+## Common Issues & Troubleshooting
 
-1. Register an account at egister.html.
-2. Log in at login.html.
-3. The backend validates credentials and returns a signed JWT token.
-4. The frontend stores the token in localStorage as campusskill_token.
-5. The token is valid for **1 day**.
-6. Clicking **Logout** removes the token from localStorage.
-
----
-
-## Common Issues
-
-| Problem                               | Solution                                                          |
-|---------------------------------------|-------------------------------------------------------------------|
-| ECONNREFUSED on login/register        | Backend is not running - run 
-pm run dev inside ackend/      |
-| password authentication failed      | Wrong DB_PASSWORD in .env                                     |
-| elation "users" does not exist     | init.sql was not run - repeat Step 2                            |
-| CORS error in browser console         | Ensure backend is running on port 5000                            |
+| Problem | Cause | Solution |
+|---|---|---|
+| **`Cannot GET /`** | Accessing backend root before static routing | Visit `http://localhost:5000` (auto-redirects) or `http://localhost:5000/campus-skill-exchange/index.html` |
+| **API calls fail when opening `index.html`** | Opening as `file:///...` directly | Browsers block `file:///` API calls due to CORS. Always access via `http://localhost:5000` |
+| **`ECONNREFUSED` on login/register** | Backend server is offline | Start backend with `npm run dev` inside `backend/` |
+| **`password authentication failed`** | Incorrect PostgreSQL password in `.env` | Update `DB_PASSWORD` in `backend/.env` to match PostgreSQL |
+| **`relation "users" does not exist`** | Database schema was not initialized | Run `backend/database/init.sql` in pgAdmin Query Tool |
+| **Duplicate key error during seeding** | Seed data already exists | All statements have `ON CONFLICT DO NOTHING`, safe to re-run |
 
 ---
 
 ## Team
 
-Web Programming Mini Project - Campus Skill Exchange Platform
+Web Programming Mini Project — Campus Skill Exchange Platform
 
 ---
 
