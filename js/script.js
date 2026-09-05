@@ -2,6 +2,9 @@
    Campus Skill Exchange - JavaScript
    ========================================= */
 
+// Backend API base URL
+const API_BASE = "http://localhost:5000/api";
+
 // Show a simple message
 function showMessage(message, type = "success") {
     const alertBox = document.createElement("div");
@@ -18,52 +21,58 @@ function showMessage(message, type = "success") {
     }, 2500);
 }
 
-function handleRegistration(event) {
+async function handleRegistration(event) {
 
     event.preventDefault();
 
     const form = document.getElementById("registerForm");
 
+    const username = document.getElementById("name").value.trim();
+    const email = document.getElementById("email").value.trim();
+    const department = document.getElementById("department").value;
+    const year = document.getElementById("year").value;
     const password = document.getElementById("password").value;
-    const confirmPassword =
-        document.getElementById("confirmPassword").value;
-
-    const confirmPasswordInput =
-        document.getElementById("confirmPassword");
+    const confirmPassword = document.getElementById("confirmPassword").value;
+    const confirmPasswordInput = document.getElementById("confirmPassword");
 
     // Basic HTML validation
     if (!form.checkValidity()) {
-
         form.classList.add("was-validated");
-
         return;
     }
 
     // Password matching
     if (password !== confirmPassword) {
-
-        confirmPasswordInput.setCustomValidity(
-            "Passwords do not match"
-        );
-
+        confirmPasswordInput.setCustomValidity("Passwords do not match");
         form.classList.add("was-validated");
-
         return;
     }
 
     confirmPasswordInput.setCustomValidity("");
 
-    // Demo success
-    showMessage(
-        "Account created successfully!",
-        "success"
-    );
+    try {
+        const response = await fetch(`${API_BASE}/auth/register`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ username, email, password, department, year })
+        });
 
-    setTimeout(() => {
+        const data = await response.json();
 
-        window.location.href = "login.html";
+        if (!response.ok) {
+            showMessage(data.error || "Registration failed. Please try again.", "danger");
+            return;
+        }
 
-    }, 1000);
+        showMessage("Account created successfully!", "success");
+
+        setTimeout(() => {
+            window.location.href = "login.html";
+        }, 1000);
+
+    } catch (err) {
+        showMessage("Could not connect to server. Make sure the backend is running.", "danger");
+    }
 }
 
 
@@ -81,24 +90,52 @@ function validateForm(formId) {
     return true;
 }
 
-// Demo login
-function handleLogin(event) {
+// Login — calls the backend API and stores the JWT token
+async function handleLogin(event) {
     event.preventDefault();
 
     if (!validateForm("loginForm")) {
         return;
     }
 
-    showMessage("Login successful!");
+    const email = document.getElementById("loginEmail").value.trim();
+    const password = document.getElementById("loginPassword").value;
 
-    setTimeout(() => {
-        window.location.href = "dashboard.html";
-    }, 1000);
+    try {
+        const response = await fetch(`${API_BASE}/auth/login`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email, password })
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            showMessage(data.error || "Login failed. Check your credentials.", "danger");
+            return;
+        }
+
+        // Store the JWT token and basic user info
+        localStorage.setItem("campusskill_token", data.token);
+        localStorage.setItem("campusskill_user", JSON.stringify(data.user));
+
+        showMessage("Login successful!");
+
+        setTimeout(() => {
+            window.location.href = "dashboard.html";
+        }, 1000);
+
+    } catch (err) {
+        showMessage("Could not connect to server. Make sure the backend is running.", "danger");
+    }
 }
 
 
-// Logout
+// Logout — clears the JWT and redirects to home
 function logout() {
+    localStorage.removeItem("campusskill_token");
+    localStorage.removeItem("campusskill_user");
+
     showMessage("Logged out successfully.");
 
     setTimeout(() => {
@@ -450,115 +487,248 @@ function initRequestsPage() {
 
 
 /* =========================================
-   Profile editor page
+   Profile editor page — API-driven
    ========================================= */
 
-const PROFILE_KEY = "campusskill_profile";
+// Holds the user's current skills in memory while on the profile page
+let __profileSkills = { offering: [], learning: [] };
 
-const DEFAULT_PROFILE = {
-    name: "Aditi Verma",
-    department: "Computer Science",
-    year: "2nd Year",
-    bio: "Passionate about full-stack web development and always excited to learn something new.",
-    teach: ["HTML", "CSS", "JavaScript"],
-    learn: ["React", "Node.js", "MongoDB"]
-};
-
-function loadProfile() {
-    const stored = localStorage.getItem(PROFILE_KEY);
-
-    if (!stored) {
-        localStorage.setItem(PROFILE_KEY, JSON.stringify(DEFAULT_PROFILE));
-        return JSON.parse(JSON.stringify(DEFAULT_PROFILE));
-    }
-
-    try {
-        return JSON.parse(stored);
-    } catch (e) {
-        return JSON.parse(JSON.stringify(DEFAULT_PROFILE));
-    }
-}
-
-function saveProfile(profile) {
-    localStorage.setItem(PROFILE_KEY, JSON.stringify(profile));
-}
-
-function renderTagList(containerId, skills) {
+function renderTagList(containerId, skills, type) {
     const container = document.getElementById(containerId);
     if (!container) return;
 
+    if (!skills.length) {
+        container.innerHTML = "<span style=\"color:#64748b\">None added yet.</span>";
+        return;
+    }
+
     container.innerHTML = skills.map(skill => `
         <span>
-            ${skill}
-            <button type="button" class="tag-remove" onclick="removeSkill('${containerId}', '${skill}')">&times;</button>
+            ${skill.name}
+            <button type="button" class="tag-remove"
+                onclick="removeSkill('${containerId}', ${skill.id}, '${type}')">
+                &times;
+            </button>
         </span>
     `).join("");
 }
 
-function getCurrentProfileState() {
-    return window.__profileState;
-}
-
-function addSkill(field) {
-    const inputId = field === "teach" ? "newTeachSkill" : "newLearnSkill";
-    const input = document.getElementById(inputId);
-
-    if (!input || !input.value.trim()) return;
-
-    const state = getCurrentProfileState();
-    const value = input.value.trim();
-
-    if (!state[field].includes(value)) {
-        state[field].push(value);
-        renderTagList(field === "teach" ? "teachTags" : "learnTags", state[field]);
-    }
-
-    input.value = "";
-}
-
-function removeSkill(containerId, skill) {
-    const field = containerId === "teachTags" ? "teach" : "learn";
-    const state = getCurrentProfileState();
-
-    state[field] = state[field].filter(s => s !== skill);
-    renderTagList(containerId, state[field]);
-}
-
-function initProfilePage() {
+async function initProfilePage() {
     const form = document.getElementById("profileForm");
     if (!form) return;
 
-    const profile = loadProfile();
-    window.__profileState = profile;
-
-    document.getElementById("profileName").value = profile.name;
-    document.getElementById("profileDepartment").value = profile.department;
-    document.getElementById("profileYear").value = profile.year;
-    document.getElementById("profileBio").value = profile.bio;
-
-    const avatarLetters = document.getElementById("profileAvatarLetters");
-    if (avatarLetters) {
-        avatarLetters.textContent = profile.name.split(" ").map(n => n[0]).join("").slice(0, 2);
+    const token = localStorage.getItem("campusskill_token");
+    if (!token) {
+        window.location.href = "login.html";
+        return;
     }
 
-    renderTagList("teachTags", profile.teach);
-    renderTagList("learnTags", profile.learn);
+    try {
+        // Load profile info
+        const res = await fetch(`${API_BASE}/profile/me`, {
+            headers: { "Authorization": `Bearer ${token}` }
+        });
+
+        if (res.status === 401) {
+            window.location.href = "login.html";
+            return;
+        }
+
+        const user = await res.json();
+
+        document.getElementById("profileName").value       = user.username   || "";
+        document.getElementById("profileDepartment").value = user.department || "Computer Science";
+        document.getElementById("profileYear").value       = user.year       || "1st Year";
+        document.getElementById("profileBio").value        = user.bio        || "";
+
+        const avatarEl = document.getElementById("profileAvatarLetters");
+        if (avatarEl) {
+            avatarEl.textContent = (user.username || "U")
+                .split(" ").map(n => n[0]).join("").slice(0, 2).toUpperCase();
+        }
+
+        // Load skills
+        const skillsRes = await fetch(`${API_BASE}/profile/skills`, {
+            headers: { "Authorization": `Bearer ${token}` }
+        });
+        const skillsData = await skillsRes.json();
+        __profileSkills = skillsData;
+
+        renderTagList("teachTags", skillsData.offering, "offering");
+        renderTagList("learnTags", skillsData.learning, "learning");
+
+    } catch (err) {
+        showMessage("Could not load profile. Is the server running?", "danger");
+    }
 
     form.addEventListener("submit", handleProfileSave);
 }
 
-function handleProfileSave(event) {
+async function addSkill(field) {
+    const inputId = field === "teach" ? "newTeachSkill" : "newLearnSkill";
+    const input   = document.getElementById(inputId);
+    if (!input || !input.value.trim()) return;
+
+    const skillName = input.value.trim();
+    const type      = field === "teach" ? "offering" : "learning";
+    const token     = localStorage.getItem("campusskill_token");
+
+    try {
+        const res = await fetch(`${API_BASE}/profile/skills`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
+            },
+            body: JSON.stringify({ skillName, type })
+        });
+
+        const data = await res.json();
+
+        if (!res.ok) {
+            showMessage(data.error || "Could not add skill.", "danger");
+            return;
+        }
+
+        // Update local state and re-render
+        if (type === "offering") {
+            // avoid duplicate display
+            if (!__profileSkills.offering.find(s => s.id === data.id)) {
+                __profileSkills.offering.push({ id: data.id, name: data.name });
+            }
+            renderTagList("teachTags", __profileSkills.offering, "offering");
+        } else {
+            if (!__profileSkills.learning.find(s => s.id === data.id)) {
+                __profileSkills.learning.push({ id: data.id, name: data.name });
+            }
+            renderTagList("learnTags", __profileSkills.learning, "learning");
+        }
+
+        input.value = "";
+
+    } catch (err) {
+        showMessage("Could not connect to server.", "danger");
+    }
+}
+
+async function removeSkill(containerId, skillId, type) {
+    const token = localStorage.getItem("campusskill_token");
+
+    try {
+        await fetch(`${API_BASE}/profile/skills/${skillId}/${type}`, {
+            method: "DELETE",
+            headers: { "Authorization": `Bearer ${token}` }
+        });
+
+        if (type === "offering") {
+            __profileSkills.offering = __profileSkills.offering.filter(s => s.id !== skillId);
+            renderTagList("teachTags", __profileSkills.offering, "offering");
+        } else {
+            __profileSkills.learning = __profileSkills.learning.filter(s => s.id !== skillId);
+            renderTagList("learnTags", __profileSkills.learning, "learning");
+        }
+
+    } catch (err) {
+        showMessage("Could not remove skill.", "danger");
+    }
+}
+
+async function handleProfileSave(event) {
     event.preventDefault();
 
-    const state = getCurrentProfileState();
+    const token      = localStorage.getItem("campusskill_token");
+    const username   = document.getElementById("profileName").value.trim();
+    const department = document.getElementById("profileDepartment").value;
+    const year       = document.getElementById("profileYear").value;
+    const bio        = document.getElementById("profileBio").value.trim();
 
-    state.name = document.getElementById("profileName").value.trim() || state.name;
-    state.department = document.getElementById("profileDepartment").value;
-    state.year = document.getElementById("profileYear").value;
-    state.bio = document.getElementById("profileBio").value.trim();
+    try {
+        const res = await fetch(`${API_BASE}/profile/update`, {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
+            },
+            body: JSON.stringify({ username, bio, department, year })
+        });
 
-    saveProfile(state);
-    showMessage("Profile updated successfully!");
+        const data = await res.json();
+
+        if (!res.ok) {
+            showMessage(data.error || "Could not save profile.", "danger");
+            return;
+        }
+
+        // Keep localStorage user object in sync
+        const storedUser = JSON.parse(localStorage.getItem("campusskill_user") || "{}");
+        storedUser.username = data.username;
+        localStorage.setItem("campusskill_user", JSON.stringify(storedUser));
+
+        // Update avatar initials
+        const avatarEl = document.getElementById("profileAvatarLetters");
+        if (avatarEl) {
+            avatarEl.textContent = data.username
+                .split(" ").map(n => n[0]).join("").slice(0, 2).toUpperCase();
+        }
+
+        showMessage("Profile updated successfully!");
+
+    } catch (err) {
+        showMessage("Could not connect to server.", "danger");
+    }
+}
+
+
+/* =========================================
+   Dashboard page — show real user name & skills
+   ========================================= */
+
+async function initDashboardPage() {
+    const welcomeEl = document.getElementById("dashboardWelcome");
+    if (!welcomeEl) return;
+
+    const token = localStorage.getItem("campusskill_token");
+    if (!token) {
+        window.location.href = "login.html";
+        return;
+    }
+
+    try {
+        const res = await fetch(`${API_BASE}/profile/me`, {
+            headers: { "Authorization": `Bearer ${token}` }
+        });
+
+        if (res.status === 401) {
+            window.location.href = "login.html";
+            return;
+        }
+
+        const user = await res.json();
+        welcomeEl.textContent = `Welcome back, ${user.username}!`;
+
+        // Load and show skills
+        const skillsRes = await fetch(`${API_BASE}/profile/skills`, {
+            headers: { "Authorization": `Bearer ${token}` }
+        });
+        const skillsData = await skillsRes.json();
+
+        const teachEl = document.getElementById("dashboardTeachSkills");
+        const learnEl = document.getElementById("dashboardLearnSkills");
+
+        if (teachEl) {
+            teachEl.innerHTML = skillsData.offering.length
+                ? skillsData.offering.map(s => `<span>${s.name}</span>`).join("")
+                : "<span style=\"color:#64748b\">No skills added yet — <a href='profile.html'>add some!</a></span>";
+        }
+        if (learnEl) {
+            learnEl.innerHTML = skillsData.learning.length
+                ? skillsData.learning.map(s => `<span>${s.name}</span>`).join("")
+                : "<span style=\"color:#64748b\">No skills added yet — <a href='profile.html'>add some!</a></span>";
+        }
+
+    } catch (err) {
+        console.error("Dashboard load error:", err);
+    }
 }
 
 
@@ -571,4 +741,6 @@ document.addEventListener("DOMContentLoaded", () => {
     loadStudentProfile();
     initRequestsPage();
     initProfilePage();
+    initDashboardPage();
 });
+
