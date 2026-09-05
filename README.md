@@ -229,12 +229,5 @@ WEB_PROGRAMMING_MINIPROJECT/
 | **`relation "users" does not exist`** | Database schema was not initialized | Run `backend/database/init.sql` in pgAdmin Query Tool |
 | **Duplicate key error during seeding** | Seed data already exists | All statements have `ON CONFLICT DO NOTHING`, safe to re-run |
 
----
-
-## Team
-
-Web Programming Mini Project — Campus Skill Exchange Platform
-
----
 
 Happy learning!
