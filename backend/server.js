@@ -1,9 +1,10 @@
-﻿import express from 'express';
+import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import authRoutes from './src/routes/authRoutes.js';
 import requestRoutes from './src/routes/requestRoutes.js';
 import profileRoutes from './src/routes/profileRoutes.js';
+import userRoutes from './src/routes/userRoutes.js';
 
 dotenv.config();
 
@@ -17,6 +18,8 @@ app.use(express.json());
 app.use('/api/auth',     authRoutes);
 app.use('/api/requests', requestRoutes);
 app.use('/api/profile',  profileRoutes);
+app.use('/api/users',    userRoutes);
+
 
 // Global Error Handler
 app.use((err, req, res, next) => {

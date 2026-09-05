@@ -271,31 +271,57 @@ function renderStudentResults(list) {
     container.innerHTML = list.map(getStudentCardHTML).join("");
 }
 
+let _searchTimeout = null;
+
+async function fetchAndRenderStudents(query = "", department = "all") {
+    const container = document.getElementById("studentResults");
+    if (!container) return;
+
+    const token = localStorage.getItem("campusskill_token");
+    if (!token) return;
+
+    try {
+        const url = new URL(`${API_BASE}/users/search`);
+        if (query) url.searchParams.append("q", query);
+        if (department && department !== "all") url.searchParams.append("department", department);
+
+        const res = await fetch(url, {
+            headers: { "Authorization": `Bearer ${token}` }
+        });
+
+        if (!res.ok) {
+            throw new Error("Failed to fetch students");
+        }
+
+        const users = await res.json();
+        
+        // Add fake rating for UI purposes for now
+        users.forEach(u => u.rating = 5.0);
+
+        renderStudentResults(users);
+    } catch (err) {
+        console.error("Search error:", err);
+    }
+}
+
 function filterStudents() {
     const searchInput = document.getElementById("studentSearch");
     const deptFilter = document.getElementById("departmentFilter");
 
-    const query = searchInput ? searchInput.value.trim().toLowerCase() : "";
+    const query = searchInput ? searchInput.value.trim() : "";
     const department = deptFilter ? deptFilter.value : "all";
 
-    const filtered = STUDENTS.filter(student => {
-        const matchesQuery =
-            query === "" ||
-            student.name.toLowerCase().includes(query) ||
-            student.teach.some(skill => skill.toLowerCase().includes(query));
-
-        const matchesDept =
-            department === "all" || student.department === department;
-
-        return matchesQuery && matchesDept;
-    });
-
-    renderStudentResults(filtered);
+    // Debounce the search input
+    if (_searchTimeout) clearTimeout(_searchTimeout);
+    
+    _searchTimeout = setTimeout(() => {
+        fetchAndRenderStudents(query, department);
+    }, 300);
 }
 
 function initSearchPage() {
     if (!document.getElementById("studentResults")) return;
-    renderStudentResults(STUDENTS);
+    fetchAndRenderStudents();
 }
 
 
@@ -308,104 +334,170 @@ function getQueryParam(name) {
     return params.get(name);
 }
 
-function loadStudentProfile() {
+async function loadStudentProfile() {
     const wrapper = document.getElementById("studentProfileContent");
     if (!wrapper) return;
 
-    const id = getQueryParam("id") || "ananya";
-    const student = STUDENTS.find(s => s.id === id) || STUDENTS[0];
+    const id = getQueryParam("id");
+    if (!id) {
+        wrapper.innerHTML = "<p>Student not found.</p>";
+        return;
+    }
 
-    document.title = `${student.name} - CampusSkill`;
+    const token = localStorage.getItem("campusskill_token");
+    if (!token) return;
 
-    wrapper.innerHTML = `
-        <div class="profile-hero">
-            <div class="profile-hero-avatar">${student.initials}</div>
-            <div>
-                <h1>${student.name}</h1>
-                <p>${student.department} &middot; ${student.year}</p>
-                <p>⭐ ${student.rating} &middot; ${student.students} students taught &middot; ${student.hours} hours</p>
+    try {
+        // Fetch user profile
+        const res = await fetch(`${API_BASE}/users/${id}`, {
+            headers: { "Authorization": `Bearer ${token}` }
+        });
+
+        if (!res.ok) {
+            wrapper.innerHTML = "<p>Student not found.</p>";
+            return;
+        }
+
+        const student = await res.json();
+        
+        // Fetch current user requests to check connection status
+        const reqRes = await fetch(`${API_BASE}/requests`, {
+            headers: { "Authorization": `Bearer ${token}` }
+        });
+        const { incoming, outgoing } = await reqRes.json();
+        
+        // Check if there is an existing request involving this student
+        const outgoingReq = outgoing.find(r => r.user_id === student.id);
+        const incomingReq = incoming.find(r => r.user_id === student.id);
+        const activeReq = outgoingReq || incomingReq;
+        
+        let connectionStatus = null; // null | "pending" | "accepted" | "rejected"
+        let requestMsg = "";
+        
+        if (outgoingReq) {
+            connectionStatus = outgoingReq.status;
+            if (connectionStatus === "pending") requestMsg = "Request Pending";
+            if (connectionStatus === "accepted") requestMsg = "Connected";
+        } else if (incomingReq) {
+            connectionStatus = incomingReq.status;
+            if (connectionStatus === "pending") requestMsg = "Request Pending";
+            if (connectionStatus === "accepted") requestMsg = "Connected";
+        }
+
+        document.title = `${student.name} - CampusSkill`;
+
+        let actionButtonHTML = "";
+        if (connectionStatus === "accepted") {
+            actionButtonHTML = `
+                <button class="outline-btn" disabled style="cursor:default;">Connected</button>
+                <button class="outline-btn" onclick="removeConnection('${activeReq ? activeReq.id : ''}', '${student.name}')" style="color:#ef4444; border-color:#fca5a5; margin-left:10px; cursor:pointer;">Remove Connection</button>
+            `;
+        } else if (connectionStatus === "pending") {
+            actionButtonHTML = `<button class="outline-btn" disabled style="cursor:default;">${requestMsg}</button>`;
+        } else {
+            actionButtonHTML = `<button class="primary-btn" id="sendRequestBtn" onclick="sendCollaborationRequest('${student.id}', '${student.name}')">Send Collaboration Request</button>`;
+        }
+
+        wrapper.innerHTML = `
+            <div class="profile-hero">
+                <div class="profile-hero-avatar">${student.initials}</div>
+                <div>
+                    <h1>${student.name}</h1>
+                    <p>${student.department} &middot; ${student.year}</p>
+                    <p>⭐ 5.0 &middot; 0 students taught &middot; 0 hours</p>
+                </div>
             </div>
-        </div>
 
-        <div class="dashboard-card">
-            <h2>About</h2>
-            <p>${student.bio}</p>
-        </div>
-
-        <div class="dashboard-card">
-            <h2>Can Teach</h2>
-            <div class="skill-tags">
-                ${student.teach.map(skill => `<span>${skill}</span>`).join("")}
+            <div class="dashboard-card">
+                <h2>About</h2>
+                <p>${student.bio || 'No bio provided.'}</p>
             </div>
-        </div>
 
-        <div class="dashboard-card">
-            <h2>Wants to Learn</h2>
-            <div class="skill-tags">
-                ${student.learn.map(skill => `<span>${skill}</span>`).join("")}
+            <div class="dashboard-card">
+                <h2>Can Teach</h2>
+                <div class="skill-tags">
+                    ${student.teach.length ? student.teach.map(skill => `<span>${skill}</span>`).join("") : '<span style="color:#64748b">No skills added yet.</span>'}
+                </div>
             </div>
-        </div>
-    `;
 
-    const requestBtn = document.getElementById("sendRequestBtn");
-    if (requestBtn) {
-        requestBtn.onclick = () => sendCollaborationRequest(student.name);
+            <div class="dashboard-card">
+                <h2>Wants to Learn</h2>
+                <div class="skill-tags">
+                    ${student.learn.length ? student.learn.map(skill => `<span>${skill}</span>`).join("") : '<span style="color:#64748b">No skills added yet.</span>'}
+                </div>
+            </div>
+            
+            <div class="profile-actions">
+                ${actionButtonHTML}
+            </div>
+        `;
+
+    } catch (err) {
+        console.error(err);
+        wrapper.innerHTML = "<p>Error loading profile.</p>";
     }
 }
 
 
 /* =========================================
-   Requests page
-   (stored in localStorage so accept /
-   reject actions persist between visits)
+   Requests page & Collaboration (API-driven)
    ========================================= */
 
-const REQUESTS_KEY = "campusskill_requests";
-
-const DEFAULT_REQUESTS = {
-    incoming: [
-        { id: "r1", name: "Ananya Sharma", initials: "AS", note: "Wants to learn JavaScript from you", status: "pending" },
-        { id: "r2", name: "Vikram Kumar", initials: "VK", note: "Can teach you Python", status: "pending" },
-        { id: "r3", name: "Sarah Khan", initials: "SK", note: "Wants to learn Web Development from you", status: "accepted" }
-    ],
-    outgoing: [
-        { id: "r4", name: "Priya Mehta", initials: "PM", note: "You asked to learn UI/UX", status: "pending" },
-        { id: "r5", name: "Rahul Kumar", initials: "RK", note: "You asked to learn Machine Learning", status: "rejected" }
-    ]
-};
-
-function loadRequests() {
-    const stored = localStorage.getItem(REQUESTS_KEY);
-
-    if (!stored) {
-        localStorage.setItem(REQUESTS_KEY, JSON.stringify(DEFAULT_REQUESTS));
-        return JSON.parse(JSON.stringify(DEFAULT_REQUESTS));
-    }
+async function sendCollaborationRequest(providerId, providerName) {
+    const token = localStorage.getItem("campusskill_token");
+    if (!token) return;
 
     try {
-        return JSON.parse(stored);
-    } catch (e) {
-        return JSON.parse(JSON.stringify(DEFAULT_REQUESTS));
+        const res = await fetch(`${API_BASE}/requests`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
+            },
+            body: JSON.stringify({ provider_id: providerId })
+        });
+
+        const data = await res.json();
+        
+        if (!res.ok) {
+            showMessage(data.error || "Could not send request.", "danger");
+            return;
+        }
+
+        showMessage(`Request sent to ${providerName}!`, "success");
+        
+        // Reload the profile to show updated button state
+        loadStudentProfile();
+        
+    } catch (err) {
+        showMessage("Could not connect to server.", "danger");
     }
 }
 
-function saveRequests(data) {
-    localStorage.setItem(REQUESTS_KEY, JSON.stringify(data));
-}
+async function removeConnection(requestId, studentName) {
+    if (!requestId) return;
+    if (!confirm(`Are you sure you want to remove your connection with ${studentName}?`)) return;
 
-function sendCollaborationRequest(name) {
-    const data = loadRequests();
+    const token = localStorage.getItem("campusskill_token");
+    if (!token) return;
 
-    data.outgoing.unshift({
-        id: "r" + Date.now(),
-        name: name,
-        initials: name.split(" ").map(n => n[0]).join(""),
-        note: "You sent a collaboration request",
-        status: "pending"
-    });
+    try {
+        const res = await fetch(`${API_BASE}/requests/${requestId}`, {
+            method: "DELETE",
+            headers: { "Authorization": `Bearer ${token}` }
+        });
 
-    saveRequests(data);
-    showMessage(`Request sent to ${name}!`);
+        if (!res.ok) {
+            const data = await res.json();
+            showMessage(data.error || "Failed to remove connection.", "danger");
+            return;
+        }
+
+        showMessage(`Connection with ${studentName} removed.`);
+        loadStudentProfile();
+    } catch (err) {
+        showMessage("Could not connect to server.", "danger");
+    }
 }
 
 function getStatusLabel(status) {
@@ -423,7 +515,7 @@ function getRequestRowHTML(request, type) {
             <button class="outline-btn" onclick="respondToRequest('${type}', '${request.id}', 'rejected')">Decline</button>
         `;
     } else if (request.status === "pending" && type === "outgoing") {
-        actions = `<button class="outline-btn" onclick="respondToRequest('${type}', '${request.id}', 'rejected')">Cancel</button>`;
+        actions = `<button class="outline-btn" onclick="respondToRequest('${type}', '${request.id}', 'cancel')">Cancel</button>`;
     }
 
     return `
@@ -441,48 +533,135 @@ function getRequestRowHTML(request, type) {
     `;
 }
 
-function renderRequests() {
-    const data = loadRequests();
-
+async function fetchAndRenderRequests() {
     const incomingEl = document.getElementById("incomingRequests");
     const outgoingEl = document.getElementById("outgoingRequests");
+    if (!incomingEl && !outgoingEl) return;
 
-    if (incomingEl) {
-        incomingEl.innerHTML = data.incoming.length
-            ? data.incoming.map(r => getRequestRowHTML(r, "incoming")).join("")
-            : "<p class=\"text-muted\">No incoming requests yet.</p>";
-    }
+    const token = localStorage.getItem("campusskill_token");
+    if (!token) return;
 
-    if (outgoingEl) {
-        outgoingEl.innerHTML = data.outgoing.length
-            ? data.outgoing.map(r => getRequestRowHTML(r, "outgoing")).join("")
-            : "<p class=\"text-muted\">You haven't sent any requests yet.</p>";
+    try {
+        const res = await fetch(`${API_BASE}/requests`, {
+            headers: { "Authorization": `Bearer ${token}` }
+        });
+
+        if (!res.ok) throw new Error("Failed to fetch requests");
+        
+        const data = await res.json();
+
+        // Update badge count with pending incoming requests
+        applyNavbarRequestBadge(data.incoming);
+
+        if (incomingEl) {
+            incomingEl.innerHTML = data.incoming.length
+                ? data.incoming.map(r => getRequestRowHTML(r, "incoming")).join("")
+                : "<p class=\"text-muted\">No incoming requests yet.</p>";
+        }
+
+        if (outgoingEl) {
+            outgoingEl.innerHTML = data.outgoing.length
+                ? data.outgoing.map(r => getRequestRowHTML(r, "outgoing")).join("")
+                : "<p class=\"text-muted\">You haven't sent any requests yet.</p>";
+        }
+    } catch (err) {
+        console.error("Requests load error:", err);
+        if (incomingEl) incomingEl.innerHTML = "<p class='text-muted'>Error loading requests.</p>";
+        if (outgoingEl) outgoingEl.innerHTML = "<p class='text-muted'>Error loading requests.</p>";
     }
 }
 
-function respondToRequest(type, id, newStatus) {
-    const data = loadRequests();
-    const list = type === "incoming" ? data.incoming : data.outgoing;
-    const request = list.find(r => r.id === id);
+function applyNavbarRequestBadge(incomingRequests = []) {
+    const pendingCount = incomingRequests.filter(r => r.status === "pending").length;
+    const navLinks = document.querySelectorAll('header.navbar nav a[href*="requests.html"]');
+    navLinks.forEach(link => {
+        let badge = link.querySelector('.requests-badge');
+        if (pendingCount > 0) {
+            if (!badge) {
+                badge = document.createElement('span');
+                badge.className = 'requests-badge';
+                link.appendChild(badge);
+            }
+            badge.textContent = pendingCount > 99 ? '99+' : pendingCount;
+        } else if (badge) {
+            badge.remove();
+        }
+    });
+}
 
-    if (request) {
-        request.status = newStatus;
-        saveRequests(data);
-        renderRequests();
+async function updateNavbarRequestBadge() {
+    const token = localStorage.getItem("campusskill_token");
+    const navLinks = document.querySelectorAll('header.navbar nav a[href*="requests.html"]');
+    if (!navLinks.length) return;
 
-        if (newStatus === "accepted") {
-            showMessage(`You're now connected with ${request.name}!`);
-        } else if (type === "outgoing") {
+    if (!token) {
+        navLinks.forEach(link => {
+            const badge = link.querySelector('.requests-badge');
+            if (badge) badge.remove();
+        });
+        return;
+    }
+
+    try {
+        const res = await fetch(`${API_BASE}/requests`, {
+            headers: { "Authorization": `Bearer ${token}` }
+        });
+        if (!res.ok) return;
+        const data = await res.json();
+        applyNavbarRequestBadge(data.incoming || []);
+    } catch (err) {
+        console.error("Error updating request badge:", err);
+    }
+}
+
+async function respondToRequest(type, id, action) {
+    const token = localStorage.getItem("campusskill_token");
+    if (!token) return;
+
+    try {
+        let res;
+        if (action === 'cancel') {
+            res = await fetch(`${API_BASE}/requests/${id}`, {
+                method: "DELETE",
+                headers: { "Authorization": `Bearer ${token}` }
+            });
+        } else {
+            res = await fetch(`${API_BASE}/requests/${id}`, {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${token}`
+                },
+                body: JSON.stringify({ status: action })
+            });
+        }
+
+        if (!res.ok) {
+            const errData = await res.json();
+            showMessage(errData.error || "Action failed.", "danger");
+            return;
+        }
+
+        if (action === "accepted") {
+            showMessage(`Request accepted!`);
+        } else if (action === "cancel") {
             showMessage("Request cancelled.");
         } else {
             showMessage("Request declined.");
         }
+        
+        // Refresh the list and update badge
+        fetchAndRenderRequests();
+        updateNavbarRequestBadge();
+
+    } catch (err) {
+        showMessage("Could not connect to server.", "danger");
     }
 }
 
 function initRequestsPage() {
     if (!document.getElementById("incomingRequests")) return;
-    renderRequests();
+    fetchAndRenderRequests();
 }
 
 
@@ -726,6 +905,34 @@ async function initDashboardPage() {
                 : "<span style=\"color:#64748b\">No skills added yet — <a href='profile.html'>add some!</a></span>";
         }
 
+        // Update skills count stat card
+        const totalSkills = (skillsData.offering || []).length + (skillsData.learning || []).length;
+        const skillsStatEl = document.getElementById("dashboardSkillsStat");
+        if (skillsStatEl) {
+            skillsStatEl.textContent = `${totalSkills} skill${totalSkills === 1 ? '' : 's'} listed`;
+        }
+
+        // Fetch requests to update requests count and connections count
+        const reqRes = await fetch(`${API_BASE}/requests`, {
+            headers: { "Authorization": `Bearer ${token}` }
+        });
+        if (reqRes.ok) {
+            const reqData = await reqRes.json();
+            const pendingIncoming = (reqData.incoming || []).filter(r => r.status === "pending").length;
+            const acceptedCount = (reqData.incoming || []).filter(r => r.status === "accepted").length +
+                                  (reqData.outgoing || []).filter(r => r.status === "accepted").length;
+
+            const requestsStatEl = document.getElementById("dashboardRequestsStat");
+            if (requestsStatEl) {
+                requestsStatEl.textContent = `${pendingIncoming} pending`;
+            }
+
+            const connectionsStatEl = document.getElementById("dashboardConnectionsStat");
+            if (connectionsStatEl) {
+                connectionsStatEl.textContent = `${acceptedCount} student${acceptedCount === 1 ? '' : 's'}`;
+            }
+        }
+
     } catch (err) {
         console.error("Dashboard load error:", err);
     }
@@ -742,5 +949,6 @@ document.addEventListener("DOMContentLoaded", () => {
     initRequestsPage();
     initProfilePage();
     initDashboardPage();
+    updateNavbarRequestBadge();
 });
 
