@@ -1398,3 +1398,436 @@ header.navbar nav a[href*="requests.html"] {
 .text-muted {
     color: #64748b;
 }
+/* =============================================================================
+   LinkedIn-Style Docked Chat UI
+   ============================================================================= */
+
+/* ---- Chat Dock Container (bottom-right corner) ---- */
+#chatDock {
+    position: fixed;
+    bottom: 0;
+    right: 24px;
+    display: flex;
+    align-items: flex-end;
+    gap: 12px;
+    z-index: 10000;
+}
+
+/* ---- Conversations Tray (the left-most panel with all chats listed) ---- */
+#chatTray {
+    width: 300px;
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-bottom: none;
+    border-radius: 10px 10px 0 0;
+    box-shadow: 0 -4px 24px rgba(15,23,42,0.12);
+    display: flex;
+    flex-direction: column;
+    max-height: 420px;
+    transition: max-height 0.2s ease;
+}
+
+#chatTray.collapsed {
+    max-height: 48px;
+    overflow: hidden;
+}
+
+#chatTrayHeader {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 14px;
+    background: linear-gradient(135deg, #5b5bd6, #7c3aed);
+    border-radius: 10px 10px 0 0;
+    cursor: pointer;
+    user-select: none;
+    flex-shrink: 0;
+}
+
+#chatTrayHeader span {
+    color: #fff;
+    font-weight: 700;
+    font-size: 14px;
+}
+
+#chatTrayToggle {
+    color: #fff;
+    font-size: 16px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    line-height: 1;
+}
+
+#chatConversationList {
+    overflow-y: auto;
+    flex: 1;
+}
+
+.chat-conv-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px;
+    cursor: pointer;
+    transition: background 0.15s ease;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.chat-conv-item:hover {
+    background: #f8fafc;
+}
+
+.chat-conv-avatar {
+    width: 38px;
+    height: 38px;
+    min-width: 38px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #5b5bd6, #7c3aed);
+    color: #fff;
+    font-size: 14px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.chat-conv-info {
+    flex: 1;
+    overflow: hidden;
+}
+
+.chat-conv-name {
+    font-weight: 600;
+    font-size: 13px;
+    color: #0f172a;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.chat-conv-preview {
+    font-size: 12px;
+    color: #64748b;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+#chatTrayEmpty {
+    padding: 20px 14px;
+    color: #64748b;
+    font-size: 13px;
+    text-align: center;
+}
+
+/* ---- Individual Chat Window ---- */
+.chat-window {
+    width: 300px;
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-bottom: none;
+    border-radius: 10px 10px 0 0;
+    box-shadow: 0 -4px 24px rgba(15,23,42,0.12);
+    display: flex;
+    flex-direction: column;
+    max-height: 420px;
+    transition: max-height 0.2s ease;
+}
+
+.chat-window.collapsed {
+    max-height: 48px;
+    overflow: hidden;
+}
+
+.chat-window-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 12px;
+    background: #f8fafc;
+    border-bottom: 1px solid #e2e8f0;
+    border-radius: 10px 10px 0 0;
+    cursor: pointer;
+    user-select: none;
+    flex-shrink: 0;
+}
+
+.chat-window-header .chat-window-avatar {
+    width: 28px;
+    height: 28px;
+    min-width: 28px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #5b5bd6, #7c3aed);
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 8px;
+}
+
+.chat-window-title {
+    font-weight: 600;
+    font-size: 13px;
+    color: #0f172a;
+    flex: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.chat-window-actions {
+    display: flex;
+    gap: 4px;
+}
+
+.chat-window-actions button {
+    background: none;
+    border: none;
+    color: #64748b;
+    cursor: pointer;
+    padding: 2px 5px;
+    border-radius: 4px;
+    font-size: 14px;
+    line-height: 1;
+    transition: background 0.15s;
+}
+
+.chat-window-actions button:hover {
+    background: #e2e8f0;
+    color: #0f172a;
+}
+
+/* Message area */
+.chat-messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-height: 240px;
+    max-height: 280px;
+}
+
+.chat-msg {
+    max-width: 80%;
+    padding: 7px 11px;
+    border-radius: 14px;
+    font-size: 13px;
+    line-height: 1.45;
+    word-break: break-word;
+}
+
+.chat-msg.sent {
+    background: linear-gradient(135deg, #5b5bd6, #7c3aed);
+    color: #fff;
+    align-self: flex-end;
+    border-bottom-right-radius: 4px;
+}
+
+.chat-msg.received {
+    background: #f1f5f9;
+    color: #0f172a;
+    align-self: flex-start;
+    border-bottom-left-radius: 4px;
+}
+
+.chat-msg .msg-time {
+    display: block;
+    font-size: 10px;
+    margin-top: 3px;
+    opacity: 0.65;
+}
+
+.chat-msg-loading {
+    color: #64748b;
+    font-size: 12px;
+    text-align: center;
+    padding: 10px 0;
+}
+
+/* Message input bar */
+.chat-input-bar {
+    display: flex;
+    align-items: center;
+    border-top: 1px solid #e2e8f0;
+    padding: 8px 10px;
+    gap: 8px;
+    flex-shrink: 0;
+}
+
+.chat-input-bar input {
+    flex: 1;
+    border: 1px solid #e2e8f0;
+    border-radius: 20px;
+    padding: 7px 13px;
+    font-size: 13px;
+    outline: none;
+    background: #f8fafc;
+    transition: border-color 0.2s;
+}
+
+.chat-input-bar input:focus {
+    border-color: #5b5bd6;
+    background: #fff;
+}
+
+.chat-input-bar button {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #5b5bd6, #7c3aed);
+    border: none;
+    color: #fff;
+    font-size: 16px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: opacity 0.2s;
+}
+
+.chat-input-bar button:hover {
+    opacity: 0.88;
+}
+
+/* =============================================================================
+   My Connections Section (Dashboard)
+   ============================================================================= */
+
+.connections-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+}
+
+.connection-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 11px 0;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.connection-item:last-child {
+    border-bottom: none;
+}
+
+.connection-avatar {
+    width: 44px;
+    height: 44px;
+    min-width: 44px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #5b5bd6, #7c3aed);
+    color: #fff;
+    font-size: 15px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.connection-info {
+    flex: 1;
+    overflow: hidden;
+}
+
+.connection-name {
+    font-weight: 600;
+    font-size: 14px;
+    color: #0f172a;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.connection-meta {
+    font-size: 12px;
+    color: #64748b;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-top: 2px;
+}
+
+.connection-actions {
+    display: flex;
+    gap: 6px;
+    flex-shrink: 0;
+}
+
+.connection-actions a,
+.connection-actions button {
+    padding: 5px 10px;
+    border-radius: 7px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    border: 1px solid #e2e8f0;
+    background: #f8fafc;
+    color: #334155;
+    text-decoration: none;
+    transition: background 0.15s, border-color 0.15s;
+    white-space: nowrap;
+}
+
+.connection-actions a:hover,
+.connection-actions button:hover {
+    background: #e2e8f0;
+}
+
+.connection-actions button.chat-btn {
+    background: linear-gradient(135deg, #5b5bd6, #7c3aed);
+    color: #fff;
+    border-color: transparent;
+}
+
+.connection-actions button.chat-btn:hover {
+    opacity: 0.88;
+    background: linear-gradient(135deg, #5b5bd6, #7c3aed);
+}
+
+.connections-empty {
+    padding: 20px 0;
+    color: #64748b;
+    font-size: 13px;
+    text-align: center;
+}
+
+.connections-empty a {
+    color: #5b5bd6;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+/* =============================================================================
+   Suggested for You — search page section
+   ============================================================================= */
+
+.suggestion-match-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: linear-gradient(135deg, #ede9fe, #ddd6fe);
+    color: #5b21b6;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 3px 9px;
+    border-radius: 20px;
+    margin-top: 5px;
+    white-space: nowrap;
+}
+
+.suggestion-match-badge.high {
+    background: linear-gradient(135deg, #dcfce7, #bbf7d0);
+    color: #166534;
+}
+
+.suggestion-match-badge.medium {
+    background: linear-gradient(135deg, #fef3c7, #fde68a);
+    color: #92400e;
+}

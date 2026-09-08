@@ -371,40 +371,19 @@
                     </div>
 
 
-                    <!-- Your Network -->
+                    <!-- ✅ My Connections (live from API) -->
                     <div class="dashboard-card">
 
                         <div class="card-header">
                             <div>
-                                <h2>👥 Your Network</h2>
-                                <p>Students you've collaborated with recently.</p>
+                                <h2>🤝 My Connections</h2>
+                                <p>Students you're connected with. Chat directly from here.</p>
                             </div>
-                            <a href="search.html">Expand</a>
+                            <a href="requests.html">Manage</a>
                         </div>
 
-                        <div class="network-grid">
-
-                            <div class="network-card">
-                                <div class="network-avatar">AS</div>
-                                <h4>Ananya Sharma</h4>
-                                <p class="skill">Teaching JavaScript</p>
-                                <div class="collaboration-badge">✓ Collaborated</div>
-                            </div>
-
-                            <div class="network-card">
-                                <div class="network-avatar">RK</div>
-                                <h4>Rahul Kumar</h4>
-                                <p class="skill">Teaching Python</p>
-                                <div class="collaboration-badge">✓ Collaborated</div>
-                            </div>
-
-                            <div class="network-card">
-                                <div class="network-avatar">PM</div>
-                                <h4>Priya Mehta</h4>
-                                <p class="skill">Teaching UI/UX</p>
-                                <div class="collaboration-badge">Pending</div>
-                            </div>
-
+                        <div id="dashboardConnectionsList">
+                            <p style="color:#64748b; padding:12px 0;">Loading connections…</p>
                         </div>
 
                     </div>
@@ -582,6 +561,25 @@
 
     </footer>
 
+
+    <!-- ================================================================
+         LinkedIn-Style Docked Chat Dock
+         ================================================================ -->
+    <div id="chatDock">
+
+        <!-- Conversations Tray -->
+        <div id="chatTray" class="collapsed">
+            <div id="chatTrayHeader" onclick="chatToggleTray()">
+                <span>💬 Messaging</span>
+                <button id="chatTrayToggle" title="Expand/Collapse">▲</button>
+            </div>
+            <div id="chatConversationList">
+                <p id="chatTrayEmpty">Loading conversations…</p>
+            </div>
+        </div>
+
+    </div>
+    <!-- End Chat Dock -->
 
     <script src="../js/script.js"></script>
 </body>

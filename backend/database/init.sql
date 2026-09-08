@@ -45,6 +45,37 @@ CREATE TABLE requests (
 --   ALTER TABLE users ADD COLUMN IF NOT EXISTS year VARCHAR(20);
 -- ─────────────────────────────────────────────────────────────────────────────
 
+-- Chat: Conversations Table (a thread between exactly two users)
+CREATE TABLE IF NOT EXISTS conversations (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    user1_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    user2_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    -- Ensure each pair of users has at most one conversation
+    CONSTRAINT unique_conversation UNIQUE (
+        LEAST(user1_id::text, user2_id::text)::uuid,
+        GREATEST(user1_id::text, user2_id::text)::uuid
+    )
+);
+
+-- Chat: Messages Table
+CREATE TABLE IF NOT EXISTS messages (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    conversation_id UUID NOT NULL REFERENCES conversations(id) ON DELETE CASCADE,
+    sender_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    content TEXT NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Index for fast message retrieval per conversation
+CREATE INDEX IF NOT EXISTS idx_messages_conversation ON messages(conversation_id, created_at);
+
+-- ─────────────────────────────────────────────────────────────────────────────
+-- To add chat tables to an EXISTING database, run in pgAdmin Query Tool:
+--   CREATE TABLE IF NOT EXISTS conversations ( ... );  [see above]
+--   CREATE TABLE IF NOT EXISTS messages ( ... );       [see above]
+-- ─────────────────────────────────────────────────────────────────────────────
+
 
 -- =============================================================================
 --  SEED DATA: 20 Varied User Profiles, Skills & Interconnections
