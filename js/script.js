@@ -336,6 +336,7 @@ async function fetchAndRenderStudents(query = "", department = "all") {
     if (!token) return;
 
     try {
+        const url = new URL(`${API_BASE}/users/search`);
         const url = new URL(`${API_BASE}/users/search`, window.location.origin);
         if (query) url.searchParams.append("q", query);
         if (department && department !== "all") url.searchParams.append("department", department);

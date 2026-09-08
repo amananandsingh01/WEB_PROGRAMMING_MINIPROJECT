@@ -1,7 +1,7 @@
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
 -- Users Table
-CREATE TABLE users (
+CREATE TABLE IF NOT EXISTS users (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     username VARCHAR(50) UNIQUE NOT NULL,
     email VARCHAR(255) UNIQUE NOT NULL,
@@ -13,14 +13,14 @@ CREATE TABLE users (
 );
 
 -- Skills Table (catalog of all available skills)
-CREATE TABLE skills (
+CREATE TABLE IF NOT EXISTS skills (
     id SERIAL PRIMARY KEY,
     name VARCHAR(100) UNIQUE NOT NULL,
     category VARCHAR(50) NOT NULL DEFAULT 'General'
 );
 
 -- User Skills (links users to skills they offer or want to learn)
-CREATE TABLE user_skills (
+CREATE TABLE IF NOT EXISTS user_skills (
     user_id UUID REFERENCES users(id) ON DELETE CASCADE,
     skill_id INT REFERENCES skills(id) ON DELETE CASCADE,
     type VARCHAR(20) CHECK (type IN ('offering', 'learning')),
@@ -28,7 +28,7 @@ CREATE TABLE user_skills (
 );
 
 -- Requests Table (skill-swap bookings)
-CREATE TABLE requests (
+CREATE TABLE IF NOT EXISTS requests (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     requester_id UUID REFERENCES users(id) ON DELETE CASCADE,
     provider_id UUID REFERENCES users(id) ON DELETE CASCADE,
@@ -38,25 +38,17 @@ CREATE TABLE requests (
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
--- ─────────────────────────────────────────────────────────────────────────────
--- If your database ALREADY EXISTS, run these two lines in pgAdmin to add the
--- new columns WITHOUT dropping and recreating everything:
---   ALTER TABLE users ADD COLUMN IF NOT EXISTS department VARCHAR(100);
---   ALTER TABLE users ADD COLUMN IF NOT EXISTS year VARCHAR(20);
--- ─────────────────────────────────────────────────────────────────────────────
-
 -- Chat: Conversations Table (a thread between exactly two users)
 CREATE TABLE IF NOT EXISTS conversations (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     user1_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     user2_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-    -- Ensure each pair of users has at most one conversation
-    CONSTRAINT unique_conversation UNIQUE (
-        LEAST(user1_id::text, user2_id::text)::uuid,
-        GREATEST(user1_id::text, user2_id::text)::uuid
-    )
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
+
+-- Enforce that each pair of users has at most one conversation (order independent)
+CREATE UNIQUE INDEX IF NOT EXISTS unique_conversation 
+    ON conversations (LEAST(user1_id, user2_id), GREATEST(user1_id, user2_id));
 
 -- Chat: Messages Table
 CREATE TABLE IF NOT EXISTS messages (
@@ -69,12 +61,6 @@ CREATE TABLE IF NOT EXISTS messages (
 
 -- Index for fast message retrieval per conversation
 CREATE INDEX IF NOT EXISTS idx_messages_conversation ON messages(conversation_id, created_at);
-
--- ─────────────────────────────────────────────────────────────────────────────
--- To add chat tables to an EXISTING database, run in pgAdmin Query Tool:
---   CREATE TABLE IF NOT EXISTS conversations ( ... );  [see above]
---   CREATE TABLE IF NOT EXISTS messages ( ... );       [see above]
--- ─────────────────────────────────────────────────────────────────────────────
 
 
 -- =============================================================================
@@ -143,125 +129,120 @@ ON CONFLICT (id) DO NOTHING;
 
 -- 3. Insert Skills Offered and Desired (user_skills)
 INSERT INTO user_skills (user_id, skill_id, type) VALUES
--- Ananya Sharma (Expert React & JS, wants Cloud & Docker)
-('a0000000-0000-0000-0000-000000000001', 3,  'offering'), -- React
-('a0000000-0000-0000-0000-000000000001', 2,  'offering'), -- JavaScript
-('a0000000-0000-0000-0000-000000000001', 18, 'offering'), -- HTML & CSS
-('a0000000-0000-0000-0000-000000000001', 13, 'learning'), -- Docker & DevOps
-('a0000000-0000-0000-0000-000000000001', 19, 'learning'), -- Cloud Computing
+-- Ananya Sharma
+('a0000000-0000-0000-0000-000000000001', 3,  'offering'),
+('a0000000-0000-0000-0000-000000000001', 2,  'offering'),
+('a0000000-0000-0000-0000-000000000001', 18, 'offering'),
+('a0000000-0000-0000-0000-000000000001', 13, 'learning'),
+('a0000000-0000-0000-0000-000000000001', 19, 'learning'),
 
--- Vikram Kumar (Expert DSA & C++, wants React & ML)
-('a0000000-0000-0000-0000-000000000002', 5,  'offering'), -- DSA
-('a0000000-0000-0000-0000-000000000002', 6,  'offering'), -- C++
-('a0000000-0000-0000-0000-000000000002', 3,  'learning'), -- React
-('a0000000-0000-0000-0000-000000000002', 8,  'learning'), -- Machine Learning
+-- Vikram Kumar
+('a0000000-0000-0000-0000-000000000002', 5,  'offering'),
+('a0000000-0000-0000-0000-000000000002', 6,  'offering'),
+('a0000000-0000-0000-0000-000000000002', 3,  'learning'),
+('a0000000-0000-0000-0000-000000000002', 8,  'learning'),
 
--- Sarah Khan (Expert Arduino & Embedded, wants Python & DL)
-('a0000000-0000-0000-0000-000000000003', 14, 'offering'), -- Arduino & Embedded
-('a0000000-0000-0000-0000-000000000003', 6,  'offering'), -- C++
-('a0000000-0000-0000-0000-000000000003', 1,  'learning'), -- Python
-('a0000000-0000-0000-0000-000000000003', 8,  'learning'), -- Machine Learning
+-- Sarah Khan
+('a0000000-0000-0000-0000-000000000003', 14, 'offering'),
+('a0000000-0000-0000-0000-000000000003', 6,  'offering'),
+('a0000000-0000-0000-0000-000000000003', 1,  'learning'),
+('a0000000-0000-0000-0000-000000000003', 8,  'learning'),
 
--- Rahul Kumar (Expert ML & SQL, wants React & Node)
-('a0000000-0000-0000-0000-000000000004', 8,  'offering'), -- Machine Learning
-('a0000000-0000-0000-0000-000000000004', 12, 'offering'), -- SQL
-('a0000000-0000-0000-0000-000000000004', 1,  'offering'), -- Python
-('a0000000-0000-0000-0000-000000000004', 3,  'learning'), -- React
-('a0000000-0000-0000-0000-000000000004', 4,  'learning'), -- Node.js
+-- Rahul Kumar
+('a0000000-0000-0000-0000-000000000004', 8,  'offering'),
+('a0000000-0000-0000-0000-000000000004', 12, 'offering'),
+('a0000000-0000-0000-0000-000000000004', 1,  'offering'),
+('a0000000-0000-0000-0000-000000000004', 3,  'learning'),
+('a0000000-0000-0000-0000-000000000004', 4,  'learning'),
 
--- Meera Iyer (Expert Cloud & Docker, wants Go)
-('a0000000-0000-0000-0000-000000000005', 19, 'offering'), -- Cloud
-('a0000000-0000-0000-0000-000000000005', 13, 'offering'), -- Docker
-('a0000000-0000-0000-0000-000000000005', 20, 'learning'), -- Go
+-- Meera Iyer
+('a0000000-0000-0000-0000-000000000005', 19, 'offering'),
+('a0000000-0000-0000-0000-000000000005', 13, 'offering'),
+('a0000000-0000-0000-0000-000000000005', 20, 'learning'),
 
--- Priya Mehta (Expert UI/UX & Figma, wants Flutter & React)
-('a0000000-0000-0000-0000-000000000006', 9,  'offering'), -- UI/UX
-('a0000000-0000-0000-0000-000000000006', 10, 'offering'), -- Figma
-('a0000000-0000-0000-0000-000000000006', 11, 'learning'), -- Flutter
-('a0000000-0000-0000-0000-000000000006', 3,  'learning'), -- React
+-- Priya Mehta
+('a0000000-0000-0000-0000-000000000006', 9,  'offering'),
+('a0000000-0000-0000-0000-000000000006', 10, 'offering'),
+('a0000000-0000-0000-0000-000000000006', 11, 'learning'),
+('a0000000-0000-0000-0000-000000000006', 3,  'learning'),
 
--- Aman Gupta (Offers Node & SQL, wants Docker & AWS)
-('a0000000-0000-0000-0000-000000000007', 4,  'offering'), -- Node.js
-('a0000000-0000-0000-0000-000000000007', 12, 'offering'), -- SQL
-('a0000000-0000-0000-0000-000000000007', 13, 'learning'), -- Docker
-('a0000000-0000-0000-0000-000000000007', 19, 'learning'), -- Cloud
+-- Aman Gupta
+('a0000000-0000-0000-0000-000000000007', 4,  'offering'),
+('a0000000-0000-0000-0000-000000000007', 12, 'offering'),
+('a0000000-0000-0000-0000-000000000007', 13, 'learning'),
+('a0000000-0000-0000-0000-000000000007', 19, 'learning'),
 
--- Devansh Joshi (Offers Flutter, wants Node & UI/UX)
-('a0000000-0000-0000-0000-000000000008', 11, 'offering'), -- Flutter
-('a0000000-0000-0000-0000-000000000008', 4,  'learning'), -- Node.js
-('a0000000-0000-0000-0000-000000000008', 9,  'learning'), -- UI/UX
+-- Devansh Joshi
+('a0000000-0000-0000-0000-000000000008', 11, 'offering'),
+('a0000000-0000-0000-0000-000000000008', 4,  'learning'),
+('a0000000-0000-0000-0000-000000000008', 9,  'learning'),
 
--- Disha Jain (Offers CAD, wants Python)
-('a0000000-0000-0000-0000-000000000009', 16, 'offering'), -- CAD
-('a0000000-0000-0000-0000-000000000009', 1,  'learning'), -- Python
+-- Disha Jain
+('a0000000-0000-0000-0000-000000000009', 16, 'offering'),
+('a0000000-0000-0000-0000-000000000009', 1,  'learning'),
 
--- Karan Malhotra (Offers NLP & Python, wants React)
-('a0000000-0000-0000-0000-000000000010', 17, 'offering'), -- Deep Learning & NLP
-('a0000000-0000-0000-0000-000000000010', 1,  'offering'), -- Python
-('a0000000-0000-0000-0000-000000000010', 3,  'learning'), -- React
+-- Karan Malhotra
+('a0000000-0000-0000-0000-000000000010', 17, 'offering'),
+('a0000000-0000-0000-0000-000000000010', 1,  'offering'),
+('a0000000-0000-0000-0000-000000000010', 3,  'learning'),
 
--- Aditya Rao (Offers Arduino & CAD, wants Python & ROS)
-('a0000000-0000-0000-0000-000000000011', 14, 'offering'), -- Arduino
-('a0000000-0000-0000-0000-000000000011', 16, 'offering'), -- CAD
-('a0000000-0000-0000-0000-000000000011', 1,  'learning'), -- Python
+-- Aditya Rao
+('a0000000-0000-0000-0000-000000000011', 14, 'offering'),
+('a0000000-0000-0000-0000-000000000011', 16, 'offering'),
+('a0000000-0000-0000-0000-000000000011', 1,  'learning'),
 
--- Nikhil Saxena (Offers Go, wants Docker & Cloud)
-('a0000000-0000-0000-0000-000000000012', 20, 'offering'), -- Go
-('a0000000-0000-0000-0000-000000000012', 13, 'learning'), -- Docker
-('a0000000-0000-0000-0000-000000000012', 19, 'learning'), -- Cloud
+-- Nikhil Saxena
+('a0000000-0000-0000-0000-000000000012', 20, 'offering'),
+('a0000000-0000-0000-0000-000000000012', 13, 'learning'),
+('a0000000-0000-0000-0000-000000000012', 19, 'learning'),
 
--- Rohan Verma (Newbie: offers Python basics, wants Web Dev & DSA)
-('a0000000-0000-0000-0000-000000000013', 1,  'offering'), -- Python
-('a0000000-0000-0000-0000-000000000013', 18, 'learning'), -- HTML & CSS
-('a0000000-0000-0000-0000-000000000013', 2,  'learning'), -- JavaScript
-('a0000000-0000-0000-0000-000000000013', 5,  'learning'), -- DSA
+-- Rohan Verma
+('a0000000-0000-0000-0000-000000000013', 1,  'offering'),
+('a0000000-0000-0000-0000-000000000013', 18, 'learning'),
+('a0000000-0000-0000-0000-000000000013', 2,  'learning'),
+('a0000000-0000-0000-0000-000000000013', 5,  'learning'),
 
--- Kavya Nair (Newbie: wants Python)
-('a0000000-0000-0000-0000-000000000014', 1,  'learning'), -- Python
+-- Kavya Nair
+('a0000000-0000-0000-0000-000000000014', 1,  'learning'),
 
--- Tanmay Bhatia (Newbie: offers Linux basics, wants C++ & Security)
-('a0000000-0000-0000-0000-000000000015', 15, 'offering'), -- Cyber Security & Linux
-('a0000000-0000-0000-0000-000000000015', 6,  'learning'), -- C++
-('a0000000-0000-0000-0000-000000000015', 1,  'learning'), -- Python
+-- Tanmay Bhatia
+('a0000000-0000-0000-0000-000000000015', 15, 'offering'),
+('a0000000-0000-0000-0000-000000000015', 6,  'learning'),
+('a0000000-0000-0000-0000-000000000015', 1,  'learning'),
 
--- Simran Kaur (Newbie: offers Java basics, wants DSA)
-('a0000000-0000-0000-0000-000000000016', 7,  'offering'), -- Java
-('a0000000-0000-0000-0000-000000000016', 5,  'learning'), -- DSA
+-- Simran Kaur
+('a0000000-0000-0000-0000-000000000016', 7,  'offering'),
+('a0000000-0000-0000-0000-000000000016', 5,  'learning'),
 
--- Sneha Patel (Offers Circuit Design, wants C++)
-('a0000000-0000-0000-0000-000000000017', 6,  'learning'), -- C++
-('a0000000-0000-0000-0000-000000000017', 14, 'learning'), -- Arduino
+-- Sneha Patel
+('a0000000-0000-0000-0000-000000000017', 6,  'learning'),
+('a0000000-0000-0000-0000-000000000017', 14, 'learning'),
 
--- Pooja Hegde (Offers Design, wants HTML & CSS)
-('a0000000-0000-0000-0000-000000000018', 9,  'offering'), -- UI/UX
-('a0000000-0000-0000-0000-000000000018', 18, 'learning'), -- HTML & CSS
+-- Pooja Hegde
+('a0000000-0000-0000-0000-000000000018', 9,  'offering'),
+('a0000000-0000-0000-0000-000000000018', 18, 'learning'),
 
--- Ishita Sen (Offers CAD, wants Python & SQL)
-('a0000000-0000-0000-0000-000000000019', 16, 'offering'), -- CAD
-('a0000000-0000-0000-0000-000000000019', 1,  'learning'), -- Python
-('a0000000-0000-0000-0000-000000000019', 12, 'learning'), -- SQL
+-- Ishita Sen
+('a0000000-0000-0000-0000-000000000019', 16, 'offering'),
+('a0000000-0000-0000-0000-000000000019', 1,  'learning'),
+('a0000000-0000-0000-0000-000000000019', 12, 'learning'),
 
--- Zoya Farooqui (Offers Hardware, wants C++)
-('a0000000-0000-0000-0000-000000000020', 14, 'offering'), -- Arduino
-('a0000000-0000-0000-0000-000000000020', 6,  'learning')  -- C++
+-- Zoya Farooqui
+('a0000000-0000-0000-0000-000000000020', 14, 'offering'),
+('a0000000-0000-0000-0000-000000000020', 6,  'learning')
 ON CONFLICT (user_id, skill_id, type) DO NOTHING;
 
 
--- 4. Insert Realistic Interconnections (Requests & Active Connections)
+-- 4. Insert Requests
 INSERT INTO requests (id, requester_id, provider_id, skill_id, status, message) VALUES
--- Active Connections (Accepted)
 ('b0000000-0000-0000-0000-000000000001', 'a0000000-0000-0000-0000-000000000001', 'a0000000-0000-0000-0000-000000000005', 13, 'accepted', 'Hey Meera! I would love to learn Docker containerization from you for my React projects.'),
 ('b0000000-0000-0000-0000-000000000002', 'a0000000-0000-0000-0000-000000000002', 'a0000000-0000-0000-0000-000000000001', 3,  'accepted', 'Hi Ananya, can you help me build a clean web frontend for my algorithmic visualizer?'),
 ('b0000000-0000-0000-0000-000000000003', 'a0000000-0000-0000-0000-000000000006', 'a0000000-0000-0000-0000-000000000008', 11, 'accepted', 'Hi Devansh, love your mobile apps! Would be great to pair up on Flutter UI implementation.'),
 ('b0000000-0000-0000-0000-000000000004', 'a0000000-0000-0000-0000-000000000003', 'a0000000-0000-0000-0000-000000000011', 14, 'accepted', 'Hey Aditya, lets collaborate on the robotic arm controller wiring and firmware!'),
 ('b0000000-0000-0000-0000-000000000005', 'a0000000-0000-0000-0000-000000000004', 'a0000000-0000-0000-0000-000000000010', 17, 'accepted', 'Hi Karan, let us exchange notes on transformer fine-tuning and PyTorch models.'),
-
--- Pending Incoming / Outgoing Requests
 ('b0000000-0000-0000-0000-000000000006', 'a0000000-0000-0000-0000-000000000013', 'a0000000-0000-0000-0000-000000000002', 5,  'pending',  'Hello Vikram sir, I am a 1st year beginner and want to start with DSA fundamentals in C++.'),
 ('b0000000-0000-0000-0000-000000000007', 'a0000000-0000-0000-0000-000000000014', 'a0000000-0000-0000-0000-000000000004', 1,  'pending',  'Hi Rahul, could you guide me on using Python Pandas for biological DNA sequence datasets?'),
 ('b0000000-0000-0000-0000-000000000008', 'a0000000-0000-0000-0000-000000000018', 'a0000000-0000-0000-0000-000000000001', 18, 'pending',  'Hey Ananya, I can help you with branding/Figma if you can teach me CSS layouts!'),
 ('b0000000-0000-0000-0000-000000000009', 'a0000000-0000-0000-0000-000000000015', 'a0000000-0000-0000-0000-000000000002', 6,  'pending',  'Hi Vikram, looking to learn low-level C++ for cyber security exploit analysis.'),
-
--- Past / Rejected Request Examples
 ('b0000000-0000-0000-0000-000000000010', 'a0000000-0000-0000-0000-000000000007', 'a0000000-0000-0000-0000-000000000002', 5,  'rejected', 'Currently focused on web development, will reconnect next semester.')
 ON CONFLICT (id) DO NOTHING;
