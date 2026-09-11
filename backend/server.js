@@ -5,7 +5,6 @@ import authRoutes from './src/routes/authRoutes.js';
 import requestRoutes from './src/routes/requestRoutes.js';
 import profileRoutes from './src/routes/profileRoutes.js';
 import userRoutes from './src/routes/userRoutes.js';
-import chatRoutes from './src/routes/chatRoutes.js';
 
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -27,7 +26,6 @@ app.use('/api/auth',     authRoutes);
 app.use('/api/requests', requestRoutes);
 app.use('/api/profile',  profileRoutes);
 app.use('/api/users',    userRoutes);
-app.use('/api/chat',     chatRoutes);
 
 // Serve Frontend Static Files
 app.use(express.static(projectRoot));
